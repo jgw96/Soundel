@@ -1,0 +1,41 @@
+<ion-navbar primary *navbar>
+  <ion-title>
+    Claudio
+  </ion-title>
+</ion-navbar>
+
+<ion-content class="home">
+
+  <h1 padding id="headerText">What would you like to listen to?</h1>
+
+  <ion-item id="searchItem">
+    <ion-label floating>Genre, Artist or anything!</ion-label>
+    <ion-input #searchTerm type="text"></ion-input>
+  </ion-item>
+
+  <ion-scroll id="songsList" scrollY="true">
+    <ion-list>
+      <ion-item id="songListItem" *ngFor="#song of songs">
+        <h2>{{song.title}}</h2>
+        
+        <button (click)="play(song.id, song.title)" primary clear item-right>
+          <ion-icon name="play"></ion-icon>
+        </button>
+      </ion-item>
+    </ion-list>
+  </ion-scroll>
+  
+  <ion-card *ngIf="playing === true" id="playing">
+    <h2 id="currentPlayingText">Currently playing {{currentlyPlaying}}</h2>
+    
+    <button (click)="pause()" primary clear item-right>
+      <ion-icon name="pause"></ion-icon>
+    </button>
+  </ion-card>
+
+
+  <button (click)="search(searchTerm.value)" secondary fab fab-bottom fab-right fab-fixed>
+    <ion-icon name="search"></ion-icon>
+  </button>
+
+</ion-content>

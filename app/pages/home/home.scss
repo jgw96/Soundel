@@ -1,0 +1,44 @@
+.home {
+  #headerText {
+      text-align: center;
+      margin-top: 2rem;
+  }
+  
+  #searchItem {
+      width: 58%;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  
+  ion-scroll {
+      height: 40%;
+      margin-top: 4rem;
+  }
+  
+  #songListItem {
+      animation-name: fadeIn;
+      animation-duration: 1s;
+  }
+  
+  ion-card {
+      width: 40%;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: dimgrey;
+      animation-name: fadeIn;
+      animation-duration: 1s;
+  }
+  
+  #currentPlayingText {
+      color: white;
+  }
+  
+  @keyframes fadeIn {
+      from {
+          opacity: 0;
+      }
+      to {
+          opacity: 1;
+      }
+  }
+}
