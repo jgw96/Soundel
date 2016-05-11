@@ -9,7 +9,7 @@ export class HomePage {
 
   public songs: any[];
   public mainPlayer: any;
-  private loading: any;
+  private loading: Loading;
   private toast: Toast;
 
   constructor(private nav: NavController) { }
