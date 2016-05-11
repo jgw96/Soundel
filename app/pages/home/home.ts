@@ -63,7 +63,10 @@ export class HomePage {
         showCloseButton: true,
         closeButtonText: "stop"
       });
-      this.nav.present(this.toast);
+      
+      this.nav.present(this.toast).then(() => {
+        document.querySelector(".backdrop").remove();
+      })
 
       this.toast.onDismiss(() => {
         this.pause();
