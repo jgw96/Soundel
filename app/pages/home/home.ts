@@ -18,13 +18,13 @@ export class HomePage {
     SC.initialize({
       client_id: "152f0d7acb02ac226e43133ece32b7ac"
     })
-    
+
     console.log("loaded");
-    
+
     let loading = Loading.create({
       content: "Getting songs..."
     });
-    
+
     this.nav.present(loading).then(() => {
       SC.get("/tracks", {
         q: "Tame Impala"
@@ -53,55 +53,78 @@ export class HomePage {
   }
 
   public play(id: string, songName: string, songDuration: number): void {
-    SC.stream(`/tracks/${id}`).then((player) => {
-      player.play();
-      this.mainPlayer = player;
+    console.log(this.toast);
+    if (this.toast !== undefined && this.toast._destroys.length === 1 ) {
+      this.toast.setMessage(`Currently playing ${songName}`)
 
-      this.toast = Toast.create({
-        message: `Currently playing ${songName}`,
-        enableBackdropDismiss: false,
-        showCloseButton: true,
-        closeButtonText: "stop"
-      });
-      
-      this.nav.present(this.toast).then(() => {
-        document.querySelector(".backdrop").remove();
-      })
+      SC.stream(`/tracks/${id}`).then((player) => {
+        player.play();
+        this.mainPlayer = player;
 
-      this.toast.onDismiss(() => {
-        this.pause();
-      })
-
-      //set up events
-      player.on("finish", () => {
-        this.toast.dismiss().then(() => {
-          //hacky workaround
-          this.toast.dismiss();
-          
-          this.songDone();
+        this.toast.onDismiss(() => {
+          this.pause();
         })
+
+        //set up events
+        player.on("finish", () => {
+          this.toast.dismiss().then(() => {
+            //hacky workaround
+            this.toast.dismiss();
+
+            this.songDone();
+          })
+        });
+
+        player.on("audio_error", () => {
+          this.audioError();
+        });
+        player.on("no_connection", () => {
+          this.audioError();
+        });
+        player.on("no_streams", () => {
+          this.audioError();
+        });
       });
-      player.on("buffering_start", () => {
-        this.loading = Loading.create({
-          content: "Buffering..."
+    }
+    else {
+      SC.stream(`/tracks/${id}`).then((player) => {
+        player.play();
+        this.mainPlayer = player;
+
+        this.toast = Toast.create({
+          message: `Currently playing ${songName}`,
+          enableBackdropDismiss: false,
+          showCloseButton: true,
+          closeButtonText: "stop"
+        });
+
+        this.nav.present(this.toast);
+
+        this.toast.onDismiss(() => {
+          this.pause();
         })
-        this.nav.present(this.loading);
+
+        //set up events
+        player.on("finish", () => {
+          this.toast.dismiss().then(() => {
+            //hacky workaround
+            this.toast.dismiss();
+
+            this.songDone();
+          })
+        });
+
+        player.on("audio_error", () => {
+          this.audioError();
+        });
+        player.on("no_connection", () => {
+          this.audioError();
+        });
+        player.on("no_streams", () => {
+          this.audioError();
+        });
       });
-      player.on("buffering_end", () => {
-        setTimeout(() => {
-          this.loading.dismiss();
-        }, 700);
-      });
-      player.on("audio_error", () => {
-        this.audioError();
-      });
-      player.on("no_connection", () => {
-        this.audioError();
-      });
-      player.on("no_streams", () => {
-        this.audioError();
-      });
-    });
+    }
   }
 
   public pause(): void {
