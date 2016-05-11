@@ -11,8 +11,14 @@
   }
   
   ion-scroll {
-      height: 40%;
+      height: 45%;
       margin-top: 3rem;
+  }
+  
+  @media (min-height: 730px) {
+      ion-scroll {
+          height: 60%;
+      }
   }
   
   #inputItem {
