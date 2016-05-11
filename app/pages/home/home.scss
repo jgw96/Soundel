@@ -11,8 +11,12 @@
   }
   
   ion-scroll {
-      height: 40%;
-      margin-top: 4rem;
+      height: 25rem;
+      margin-top: 3rem;
+  }
+  
+  #inputItem {
+      padding-left: 0;
   }
   
   ion-card {
@@ -23,45 +27,6 @@
       background: dimgrey;
       animation-name: fadeIn;
       animation-duration: 1s;
-  }
-  
-  @media (max-width: 620px) {
-      #searchItem {
-          width: 93%;
-          margin-left: 0;
-          margin-right: 0;
-      }
-      
-      ion-scroll {
-          height: 60%;
-      }
-  }
-  
-  @media (max-width: 415px) {
-      ion-scroll {
-          height: 50%;
-      }
-      
-      ion-card {
-          width: 60%;
-          height: 7em;
-      }
-  }
-  
-  @media (max-width: 365px) {
-      ion-scroll {
-          height: 37%;
-      }
-      
-      #currentPlayingText {
-          display: none;
-      }
-      
-      ion-card {
-          height: 10%;
-          width: 11%;
-          padding: 0;
-      }
   }
   
   #songListItem {

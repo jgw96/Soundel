@@ -1,4 +1,4 @@
-import {Page, Alert, NavController, Loading} from 'ionic-angular';
+import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
 
 declare var SC: any;
 
@@ -8,10 +8,9 @@ declare var SC: any;
 export class HomePage {
 
   public songs: any[];
-  public playing: boolean;
-  public currentlyPlaying: string;
   public mainPlayer: any;
   private loading: any;
+  private toast: Toast;
 
   constructor(private nav: NavController) { }
 
@@ -19,27 +18,66 @@ export class HomePage {
     SC.initialize({
       client_id: "152f0d7acb02ac226e43133ece32b7ac"
     })
+    
+    console.log("loaded");
+    
+    /*let loading = Loading.create({
+      content: "Getting songs..."
+    });
+    
+    this.nav.present(loading).then(() => {
+      SC.get("/tracks", {
+        q: "Tame Impala"
+      }).then((tracks) => {
+        this.songs = tracks;
+        loading.dismiss();
+      });
+    });*/
 
-    this.playing = false;
   }
 
   public search(term: string): void {
-    SC.get('/tracks', {
-      q: term
-    }).then((tracks) => {
-      console.log(tracks);
-      this.songs = tracks;
+    let loading = Loading.create({
+      content: "Getting songs..."
     });
+
+    this.nav.present(loading).then(() => {
+      SC.get('/tracks', {
+        q: term
+      }).then((tracks) => {
+        console.log(tracks);
+        this.songs = tracks;
+        loading.dismiss();
+      });
+    })
   }
 
-  public play(id: string, songName: string): void {
+  public play(id: string, songName: string, songDuration: number): void {
     SC.stream(`/tracks/${id}`).then((player) => {
       player.play();
       this.mainPlayer = player;
 
+      this.toast = Toast.create({
+        message: `Currently playing ${songName}`,
+        enableBackdropDismiss: false,
+        showCloseButton: true,
+        closeButtonText: "stop"
+      });
+      this.nav.present(this.toast);
+
+      this.toast.onDismiss(() => {
+        this.toast.dismiss();
+        this.pause();
+      })
+
       //set up events
       player.on("finish", () => {
-        this.songDone();
+        this.toast.dismiss().then(() => {
+          //hacky workaround
+          this.toast.dismiss();
+          
+          this.songDone();
+        })
       });
       player.on("buffering_start", () => {
         this.loading = Loading.create({
@@ -57,14 +95,11 @@ export class HomePage {
       });
       player.on("no_connection", () => {
         this.audioError();
-      })
+      });
       player.on("no_streams", () => {
         this.audioError();
-      })
-
-    })
-    this.playing = true;
-    this.currentlyPlaying = songName;
+      });
+    });
   }
 
   public pause(): void {
@@ -89,7 +124,7 @@ export class HomePage {
             const randNum = Math.floor((Math.random() * 9) + 0);
             console.log(randNum);
 
-            this.play(this.songs[randNum].id, this.songs[randNum].title);
+            this.play(this.songs[randNum].id, this.songs[randNum].title, this.songs[randNum].duration);
           }
         }
       ]
