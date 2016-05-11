@@ -17,13 +17,13 @@
 
   <ion-scroll id="songsList" scrollY="true">
     <ion-list>
-      <ion-item button (click)="play(song.id, song.title, song.duration)" id="songListItem" *ngFor="#song of songs">
+      <button ion-item (click)="play(song.id, song.title, song.duration)" id="songListItem" *ngFor="#song of songs">
         <h2>{{song.title}}</h2>
 
         <button primary clear item-right>
           <ion-icon name="play"></ion-icon>
         </button>
-      </ion-item>
+      </button>
     </ion-list>
   </ion-scroll>
 

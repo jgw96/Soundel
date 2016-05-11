@@ -21,7 +21,7 @@ export class HomePage {
     
     console.log("loaded");
     
-    /*let loading = Loading.create({
+    let loading = Loading.create({
       content: "Getting songs..."
     });
     
@@ -32,7 +32,7 @@ export class HomePage {
         this.songs = tracks;
         loading.dismiss();
       });
-    });*/
+    });
 
   }
 
@@ -66,7 +66,6 @@ export class HomePage {
       this.nav.present(this.toast);
 
       this.toast.onDismiss(() => {
-        this.toast.dismiss();
         this.pause();
       })
 
