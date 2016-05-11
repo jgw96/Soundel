@@ -1,4 +1,5 @@
 import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
+import {Keyboard} from 'ionic-native';
 
 declare var SC: any;
 
@@ -47,7 +48,9 @@ export class HomePage {
       }).then((tracks) => {
         console.log(tracks);
         this.songs = tracks;
-        loading.dismiss();
+        loading.dismiss().then(() => {
+          Keyboard.close();
+        });
       });
     })
   }
