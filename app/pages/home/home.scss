@@ -1,4 +1,19 @@
 .home {
+    
+  ion-card {
+    position: relative;
+    text-align: center;
+  }
+
+  .card-title {
+    position: absolute;
+    top: 36%;
+    font-size: 2.0em;
+    width: 100%;
+    font-weight: bold;
+    color: #fff;
+  }
+
   #headerText {
       text-align: center;
       margin-top: 2rem;
@@ -19,20 +34,6 @@
       ion-scroll {
           height: 60%;
       }
-  }
-  
-  #inputItem {
-      padding-left: 0;
-  }
-  
-  ion-card {
-      width: 40%;
-      padding: 1rem;
-      position: absolute;
-      bottom: 5px;
-      background: dimgrey;
-      animation-name: fadeIn;
-      animation-duration: 1s;
   }
   
   #songListItem {
@@ -60,3 +61,10 @@
     text-overflow: ellipsis;
 }
 
+ion-label {
+    white-space: normal;
+}
+
+.item-input {
+    border-top: none !important;
+}

@@ -1,63 +1,92 @@
 import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
 import {Keyboard} from 'ionic-native';
 
-declare var SC: any;
+declare module "soundcloud" {
+  export default SC;
+}
+import * as SC from "soundcloud";
+
+import {MusicService} from "../../providers/music-service/music-service";
+import {Track} from "../../interfaces/track";
+import {Player} from "../../interfaces/player";
+import {ImagePipe} from "../../pipes/ImagePipe";
+
 
 @Page({
-  templateUrl: 'build/pages/home/home.html'
+  templateUrl: 'build/pages/home/home.html',
+  providers: [MusicService],
+  pipes: [ImagePipe]
 })
 export class HomePage {
 
-  public songs: any[];
-  public mainPlayer: any;
+  public songs: Track[];
+  public mainPlayer: Player;
   private loading: Loading;
   private toast: Toast;
 
-  constructor(private nav: NavController) { }
+  constructor(private nav: NavController, private musicService: MusicService) { }
 
   private onPageLoaded(): void {
-    SC.initialize({
-      client_id: "152f0d7acb02ac226e43133ece32b7ac"
-    })
-
-    console.log("loaded");
+    this.musicService.init();
 
     let loading = Loading.create({
       content: "Getting songs..."
     });
 
     this.nav.present(loading).then(() => {
-      SC.get("/tracks", {
-        q: "Tame Impala"
-      }).then((tracks) => {
-        this.songs = tracks;
-        loading.dismiss();
-      });
-    });
-
-  }
-
-  public search(term: string): void {
-    let loading = Loading.create({
-      content: "Getting songs..."
-    });
-
-    this.nav.present(loading).then(() => {
-      SC.get('/tracks', {
-        q: term
-      }).then((tracks) => {
+      this.musicService.getFirstTracks().then((tracks) => {
         console.log(tracks);
         this.songs = tracks;
-        loading.dismiss().then(() => {
-          Keyboard.close();
-        });
-      });
-    })
+        loading.dismiss();
+      })
+    });
+
   }
 
-  public play(id: string, songName: string, songDuration: number): void {
-    console.log(this.toast);
-    if (this.toast !== undefined && this.toast._destroys.length === 1 ) {
+  public search(): void {
+
+    let prompt = Alert.create({
+      title: 'Search',
+      message: "Enter a genre, artist or anything!",
+      inputs: [
+        {
+          name: 'term',
+          placeholder: 'Tame Impala'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'search',
+          handler: data => {
+            console.log('Saved clicked');
+
+            let loading = Loading.create({
+              content: "Getting songs..."
+            });
+
+            this.nav.present(loading).then(() => {
+              this.musicService.getTracks(data.term).then((tracks) => {
+                this.songs = tracks;
+                loading.dismiss();
+              });
+            });
+            
+          }
+        }
+      ]
+    });
+    
+    this.nav.present(prompt);
+  }
+
+  public play(id: string, songName: string, duration: number): void {
+    if (this.toast !== undefined && this.toast._destroys.length === 1) {
       this.toast.setMessage(`Currently playing ${songName}`)
 
       SC.stream(`/tracks/${id}`).then((player) => {
@@ -149,10 +178,15 @@ export class HomePage {
           text: 'Yes',
           handler: () => {
             console.log(this.songs);
-            const randNum = Math.floor((Math.random() * 9) + 0);
+            const randNum: number = Math.floor((Math.random() * 9) + 0);
             console.log(randNum);
 
-            this.play(this.songs[randNum].id, this.songs[randNum].title, this.songs[randNum].duration);
+            this.play(
+              this.songs[randNum].id,
+              this.songs[randNum].title,
+              this.songs[randNum].duration
+            );
+
           }
         }
       ]

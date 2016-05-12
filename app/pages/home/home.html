@@ -6,25 +6,28 @@
 
 <ion-content class="home">
 
-  <h1 padding id="headerText">What would you like to listen to?</h1>
+  <!--<ion-card>
+    <ion-card-header>
+      What would you like to listen to?
+    </ion-card-header>
 
-  <div padding>
-    <ion-item id="inputItem">
-      <ion-label floating>Genre, Artist or anything!</ion-label>
-      <ion-input (keyup.enter)="search(searchTerm.value)" #searchTerm type="text"></ion-input>
-    </ion-item>
-  </div>
-
-  <ion-scroll id="songsList" scrollY="true">
-    <ion-list>
-      <button ion-item (click)="play(song.id, song.title, song.duration)" id="songListItem" *ngFor="#song of songs">
-        <h2>{{song.title}}</h2>
-
-        <button primary clear item-right>
-          <ion-icon name="play"></ion-icon>
-        </button>
-      </button>
-    </ion-list>
-  </ion-scroll>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-input placeholder="Genre, Artist or anything!" (keyup.enter)="search(searchTerm.value)" #searchTerm type="text"></ion-input>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>-->
+  
+  
+  <ion-card (click)="play(song.id, song.title, song.duration)" [hidden]="song.artwork_url === null" *ngFor="#song of songs">
+    <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
+    <div class="card-title">{{song.title}}</div>
+  </ion-card>
+  
+  <button (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
+    <ion-icon name="search"></ion-icon>
+  </button>
 
 </ion-content>
