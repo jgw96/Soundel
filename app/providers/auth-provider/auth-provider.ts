@@ -13,7 +13,6 @@ declare var OAuth: any;
 @Injectable()
 export class AuthProvider {
 
-  public token: string;
   public avatar: string;
 
   constructor(private http: Http) { }
@@ -25,7 +24,7 @@ export class AuthProvider {
       OAuth.popup("soundcloud")
         .done((result) => {
           console.log(result);
-          this.token = result.access_token;
+          localStorage.setItem("claudioToken", result.access_token);
           result.me()
             .done((response) => {
               console.log(response);
@@ -42,14 +41,24 @@ export class AuthProvider {
   }
 
   public getToken(): string {
-    return this.token;
+    const token = localStorage.getItem("claudioToken");
+    return token;
   }
 
   public likeTrack(id: string): Observable<any> {
-    let token = this.token;
+    let token = this.getToken();
     let body = JSON.stringify({})
 
     return this.http.put(`https://api.soundcloud.com/me/favorites/${id}?oauth_token=${token}`, body)
+      .map(this.extractData)
+      .catch(this.handleError);
+  }
+
+  public getLiked(): Observable<any> {
+    console.log(this.getToken());
+    let token = this.getToken();
+
+    return this.http.get(`https://api.soundcloud.com/me/favorites?oauth_token=${token}`)
       .map(this.extractData)
       .catch(this.handleError);
   }

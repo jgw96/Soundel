@@ -1,98 +1,52 @@
-import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
-import {Keyboard} from 'ionic-native';
-import {Toast as NativeToast} from "ionic-native";
-
+import {Page, NavController, Toast, Alert, Loading} from 'ionic-angular';
 import {HTTP_PROVIDERS} from "angular2/http";
+
+import {AuthProvider} from "../../providers/auth-provider/auth-provider";
+import {Track} from "../../interfaces/track";
+import {ImagePipe} from "../../pipes/ImagePipe";
+import {Player} from "../../interfaces/player";
 
 declare module "soundcloud" {
   export default SC;
 }
 import * as SC from "soundcloud";
 
-import {MusicService} from "../../providers/music-service/music-service";
-import {AuthProvider} from "../../providers/auth-provider/auth-provider";
-import {Track} from "../../interfaces/track";
-import {Player} from "../../interfaces/player";
-import {ImagePipe} from "../../pipes/ImagePipe";
+/*
+  Generated class for the LikedPage page.
 
-
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+*/
 @Page({
-  templateUrl: 'build/pages/home/home.html',
-  providers: [MusicService, AuthProvider, HTTP_PROVIDERS],
+  templateUrl: 'build/pages/liked/liked.html',
+  providers: [AuthProvider, HTTP_PROVIDERS],
   pipes: [ImagePipe]
 })
-export class HomePage {
+export class LikedPage {
 
   public songs: Track[];
   public mainPlayer: Player;
   private loading: Loading;
   private toast: Toast;
-  public loggedIn: boolean;
-  public avatar: string
 
-  constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider) { }
-
-  private onPageLoaded(): void {
-
-    this.musicService.init();
-    
-    this.loggedIn = false;
-
+  onPageDidEnter() {
     let loading = Loading.create({
       content: "Getting songs..."
     });
 
     this.nav.present(loading).then(() => {
-      this.musicService.getFirstTracks().then((tracks) => {
-        console.log(tracks);
-        this.songs = tracks;
-        loading.dismiss();
-      })
+      this.authProvider.getLiked()
+        .subscribe(
+        data => {
+          this.songs = data;
+          loading.dismiss();
+        },
+        error => alert(error)
+        )
     });
 
   }
-
-  public search(): void {
-
-    let prompt = Alert.create({
-      title: 'Search',
-      message: "Enter a genre, artist or anything!",
-      inputs: [
-        {
-          name: 'term',
-          placeholder: 'Tame Impala'
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          handler: data => {
-            console.log('Cancel clicked');
-          }
-        },
-        {
-          text: 'search',
-          handler: data => {
-            console.log('Saved clicked');
-
-            let loading = Loading.create({
-              content: "Getting songs..."
-            });
-
-            this.nav.present(loading).then(() => {
-              this.musicService.getTracks(data.term).then((tracks) => {
-                this.songs = tracks;
-                loading.dismiss();
-              });
-            });
-
-          }
-        }
-      ]
-    });
-
-    this.nav.present(prompt);
-  }
+  constructor(private nav: NavController, private authProvider: AuthProvider) { }
 
   public play(id: string, songName: string, duration: number): void {
     if (this.toast !== undefined && this.toast._destroys.length === 1) {
@@ -204,38 +158,6 @@ export class HomePage {
 
     this.nav.present(confirm);
   }
-  
-  public login(): void {
-    this.authService.login().then((result) => {
-      console.log(result);
-      this.loggedIn = true;
-      this.avatar = result;
-      
-      let toast = Toast.create({
-        message: "Succesfully logged in",
-        duration: 3000
-      });
-      this.nav.present(toast);
-    }).catch((err) => {
-      alert(err);
-    })
-  }
-  
-  public like(id: string): void {
-    this.authService.likeTrack(id)
-    .subscribe(
-      data => {
-        console.log(data)
-        
-        NativeToast.showShortBottom("Song Liked")
-        .subscribe(
-          done => console.log("done"),
-          error => console.log(error)
-        )
-      },
-      error => alert(error)
-    )
-  }
 
   private audioError(): void {
     let alert = Alert.create({
@@ -245,5 +167,4 @@ export class HomePage {
     });
     this.nav.present(alert);
   }
-
 }
