@@ -29,13 +29,14 @@ export class HomePage {
   private toast: Toast;
   public loggedIn: boolean;
   public avatar: string
+  private toastOpen: boolean;
 
   constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider) { }
 
   private onPageLoaded(): void {
 
     this.musicService.init();
-    
+
     this.loggedIn = false;
 
     let loading = Loading.create({
@@ -49,6 +50,8 @@ export class HomePage {
         loading.dismiss();
       })
     });
+
+    this.toastOpen = false;
 
   }
 
@@ -103,6 +106,7 @@ export class HomePage {
         this.mainPlayer = player;
 
         this.toast.onDismiss(() => {
+          this.toastOpen = false;
           this.pause();
         })
 
@@ -111,6 +115,7 @@ export class HomePage {
           this.toast.dismiss().then(() => {
             //hacky workaround
             this.toast.dismiss();
+            this.toastOpen = false;
 
             this.songDone();
           })
@@ -140,9 +145,12 @@ export class HomePage {
           dismissOnPageChange: false
         });
 
-        this.nav.present(this.toast);
+        this.nav.present(this.toast).then(() => {
+          this.toastOpen = true;
+        });
 
         this.toast.onDismiss(() => {
+          this.toastOpen = false;
           this.pause();
         })
 
@@ -204,13 +212,13 @@ export class HomePage {
 
     this.nav.present(confirm);
   }
-  
+
   public login(): void {
     this.authService.login().then((result) => {
       console.log(result);
       this.loggedIn = true;
       this.avatar = result;
-      
+
       let toast = Toast.create({
         message: "Succesfully logged in",
         duration: 3000
@@ -220,21 +228,31 @@ export class HomePage {
       alert(err);
     })
   }
-  
+
   public like(id: string): void {
     this.authService.likeTrack(id)
-    .subscribe(
+      .subscribe(
       data => {
         console.log(data)
-        
-        NativeToast.showShortBottom("Song Liked")
-        .subscribe(
-          done => console.log("done"),
-          error => console.log(error)
-        )
+
+        if (this.toastOpen === false) {
+          NativeToast.showShortBottom("Song Liked")
+            .subscribe(
+            done => console.log("done"),
+            error => console.log(error)
+            )
+        }
+        else {
+          NativeToast.showShortCenter("Song Liked")
+          .subscribe(
+            done => console.log("done"),
+            error => console.log(error)
+          )
+        }
+
       },
       error => alert(error)
-    )
+      )
   }
 
   private audioError(): void {
