@@ -2,30 +2,29 @@
   <ion-title>
     Claudio
   </ion-title>
+  <ion-buttons end>
+    <button [hidden]="!loggedIn">
+      <img class="avatarImage" src="{{avatar}}">
+    </button>
+    <button (click)="login()">
+      <ion-icon name="person"></ion-icon>
+    </button>
+  </ion-buttons>
 </ion-navbar>
 
 <ion-content class="home">
 
-  <!--<ion-card>
-    <ion-card-header>
-      What would you like to listen to?
-    </ion-card-header>
-
-    <ion-card-content>
-      <ion-list>
-        <ion-item>
-          <ion-input placeholder="Genre, Artist or anything!" (keyup.enter)="search(searchTerm.value)" #searchTerm type="text"></ion-input>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>-->
-  
-  
-  <ion-card (click)="play(song.id, song.title, song.duration)" [hidden]="song.artwork_url === null" *ngFor="#song of songs">
+  <ion-card [hidden]="song.artwork_url === null" *ngFor="#song of songs">
     <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
     <div class="card-title">{{song.title}}</div>
+    <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
+      <button id="likeButton">Like</button>
+    </div>
+    <div (click)="play(song.id, song.title, song.duration)" class="playButton">
+      <button>Play</button>
+    </div>
   </ion-card>
-  
+
   <button (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
     <ion-icon name="search"></ion-icon>
   </button>

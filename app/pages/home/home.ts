@@ -1,12 +1,15 @@
 import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
 import {Keyboard} from 'ionic-native';
 
+import {HTTP_PROVIDERS} from "angular2/http";
+
 declare module "soundcloud" {
   export default SC;
 }
 import * as SC from "soundcloud";
 
 import {MusicService} from "../../providers/music-service/music-service";
+import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
 import {Player} from "../../interfaces/player";
 import {ImagePipe} from "../../pipes/ImagePipe";
@@ -14,7 +17,7 @@ import {ImagePipe} from "../../pipes/ImagePipe";
 
 @Page({
   templateUrl: 'build/pages/home/home.html',
-  providers: [MusicService],
+  providers: [MusicService, AuthProvider, HTTP_PROVIDERS],
   pipes: [ImagePipe]
 })
 export class HomePage {
@@ -23,11 +26,16 @@ export class HomePage {
   public mainPlayer: Player;
   private loading: Loading;
   private toast: Toast;
+  public loggedIn: boolean;
+  public avatar: string
 
-  constructor(private nav: NavController, private musicService: MusicService) { }
+  constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider) { }
 
   private onPageLoaded(): void {
+
     this.musicService.init();
+    
+    this.loggedIn = false;
 
     let loading = Loading.create({
       content: "Getting songs..."
@@ -76,12 +84,12 @@ export class HomePage {
                 loading.dismiss();
               });
             });
-            
+
           }
         }
       ]
     });
-    
+
     this.nav.present(prompt);
   }
 
@@ -193,6 +201,38 @@ export class HomePage {
     });
 
     this.nav.present(confirm);
+  }
+  
+  public login(): void {
+    this.authService.login().then((result) => {
+      console.log(result);
+      this.loggedIn = true;
+      this.avatar = result;
+      
+      let toast = Toast.create({
+        message: "Succesfully logged in",
+        duration: 3000
+      });
+      this.nav.present(toast);
+    }).catch((err) => {
+      alert(err);
+    })
+  }
+  
+  public like(id: string): void {
+    this.authService.likeTrack(id)
+    .subscribe(
+      data => {
+        console.log(data)
+        
+        let toast = Toast.create({
+          message: "Song liked",
+          duration: 3000
+        })
+        this.nav.present(toast);
+      },
+      error => alert(error)
+    )
   }
 
   private audioError(): void {

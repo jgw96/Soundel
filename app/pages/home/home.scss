@@ -13,6 +13,24 @@
     font-weight: bold;
     color: #fff;
   }
+  
+  .likeButton {
+    font-size: 2.0em;
+    position: absolute;
+    bottom: 2%;
+    left: 2%;
+  }
+  
+  .playButton {
+      font-size: 2.0em;
+      position: absolute;
+      bottom: 2%;
+      right: 2%;
+  }
+  
+  #likeButton {
+      color: white;
+  }
 
   #headerText {
       text-align: center;
@@ -68,3 +86,9 @@ ion-label {
 .item-input {
     border-top: none !important;
 }
+
+.avatarImage {
+    height: 32px;
+    width:32px;
+    border-radius: 50%;
+  }
