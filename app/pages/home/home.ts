@@ -32,6 +32,13 @@ export class HomePage {
   private toastOpen: boolean;
 
   constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider) { }
+  
+  private onPageDidEnter(): void {
+    if(this.authService.getToken() !== null) {
+      this.loggedIn = true;
+      this.avatar = this.authService.getAvatar();
+    }
+  }
 
   private onPageLoaded(): void {
 

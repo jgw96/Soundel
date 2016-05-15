@@ -24,12 +24,11 @@ export class AuthProvider {
       OAuth.popup("soundcloud")
         .done((result) => {
           console.log(result);
-          localStorage.setItem("claudioToken", result.access_token);
+          sessionStorage.setItem("claudioToken", result.access_token);
           result.me()
             .done((response) => {
-              console.log(response);
+              sessionStorage.setItem("soundelAvatar", response.avatar);
               this.avatar = response.avatar;
-
               resolve(this.avatar);
             })
         })
@@ -39,9 +38,13 @@ export class AuthProvider {
         })
     });
   }
+  
+  public getAvatar(): string {
+    return sessionStorage.getItem("soundelAvatar");
+  }
 
   public getToken(): string {
-    const token = localStorage.getItem("claudioToken");
+    const token = sessionStorage.getItem("claudioToken");
     return token;
   }
 

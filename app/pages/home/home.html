@@ -6,7 +6,7 @@
     <button [hidden]="!loggedIn">
       <img class="avatarImage" src="{{avatar}}">
     </button>
-    <button (click)="login()">
+    <button [hidden]="loggedIn" (click)="login()">
       <ion-icon name="person"></ion-icon>
     </button>
   </ion-buttons>
@@ -18,14 +18,14 @@
     <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
     <div class="card-title">{{song.title}}</div>
     <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
-      <button id="likeButton">Like</button>
+      <button secondary id="likeButton">Like</button>
     </div>
     <div (click)="play(song.id, song.title, song.duration)" class="playButton">
-      <button>Play</button>
+      <button secondary>Play</button>
     </div>
   </ion-card>
 
-  <button (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
+  <button showWhen="android" (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
     <ion-icon name="search"></ion-icon>
   </button>
 

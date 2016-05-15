@@ -28,8 +28,43 @@ export class LikedPage {
   public mainPlayer: Player;
   private loading: Loading;
   private toast: Toast;
+  public loggedIn: boolean;
 
   onPageDidEnter() {
+    if (this.authProvider.getToken() === null) {
+      let prompt = Alert.create({
+        title: 'Not logged in',
+        message: "You must be logged in to see your liked songs. Would you like to log in now?",
+        buttons: [
+          {
+            text: 'No',
+            handler: data => {
+              console.log('Cancel clicked');
+            }
+          },
+          {
+            text: 'Yes',
+            handler: data => {
+              this.authProvider.login().then((result) => {
+                prompt.dismiss().then(() => {
+                  this.getLikedSongs();
+                })
+              })
+            }
+          }
+        ]
+      });
+      
+      this.nav.present(prompt);
+    }
+    else {
+      this.getLikedSongs();
+    }
+
+  }
+  constructor(private nav: NavController, private authProvider: AuthProvider) { }
+
+  private getLikedSongs() {
     let loading = Loading.create({
       content: "Getting songs..."
     });
@@ -41,12 +76,12 @@ export class LikedPage {
           this.songs = data;
           loading.dismiss();
         },
-        error => alert(error)
+        error => {
+          alert(error);
+        }
         )
     });
-
   }
-  constructor(private nav: NavController, private authProvider: AuthProvider) { }
 
   public play(id: string, songName: string, duration: number): void {
     if (this.toast !== undefined && this.toast._destroys.length === 1) {
