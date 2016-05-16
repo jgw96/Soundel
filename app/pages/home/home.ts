@@ -149,7 +149,8 @@ export class HomePage {
           enableBackdropDismiss: false,
           showCloseButton: true,
           closeButtonText: "stop",
-          dismissOnPageChange: false
+          dismissOnPageChange: false,
+          showBackdrop: false
         });
 
         this.nav.present(this.toast).then(() => {

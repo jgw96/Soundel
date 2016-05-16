@@ -1,5 +1,6 @@
 import {Page, NavController, Toast, Alert, Loading} from 'ionic-angular';
 import {HTTP_PROVIDERS} from "angular2/http";
+import {Input, Output, EventEmitter} from "angular2/core";
 
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
@@ -39,7 +40,7 @@ export class LikedPage {
           {
             text: 'No',
             handler: data => {
-              console.log('Cancel clicked');
+              
             }
           },
           {
