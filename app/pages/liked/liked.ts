@@ -1,6 +1,5 @@
 import {Page, NavController, Toast, Alert, Loading} from 'ionic-angular';
-import {HTTP_PROVIDERS} from "angular2/http";
-import {Input, Output, EventEmitter} from "angular2/core";
+import {HTTP_PROVIDERS} from "@angular/http";
 
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
@@ -30,8 +29,10 @@ export class LikedPage {
   private loading: Loading;
   private toast: Toast;
   public loggedIn: boolean;
+  
 
   onPageDidEnter() {
+    
     if (this.authProvider.getToken() === null) {
       let prompt = Alert.create({
         title: 'Not logged in',

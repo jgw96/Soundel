@@ -2,7 +2,7 @@ import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
 import {Keyboard} from 'ionic-native';
 import {Toast as NativeToast} from "ionic-native";
 
-import {HTTP_PROVIDERS} from "angular2/http";
+import {HTTP_PROVIDERS} from "@angular/http";
 
 declare module "soundcloud" {
   export default SC;
@@ -149,8 +149,7 @@ export class HomePage {
           enableBackdropDismiss: false,
           showCloseButton: true,
           closeButtonText: "stop",
-          dismissOnPageChange: false,
-          showBackdrop: false
+          dismissOnPageChange: false
         });
 
         this.nav.present(this.toast).then(() => {
