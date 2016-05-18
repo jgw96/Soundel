@@ -1,10 +1,11 @@
+import 'reflect-metadata';
+import 'zone.js/dist/zone';
+
 import {App, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 //import {HomePage} from './pages/home/home';
 import {TabsPage} from "./pages/tabs/tabs";
 
-import 'reflect-metadata';
-import 'zone.js/dist/zone';
 import 'rxjs/Rx';
 
 

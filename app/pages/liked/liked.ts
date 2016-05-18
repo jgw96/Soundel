@@ -6,10 +6,12 @@ import {Track} from "../../interfaces/track";
 import {ImagePipe} from "../../pipes/ImagePipe";
 import {Player} from "../../interfaces/player";
 
-declare module "soundcloud" {
+/*declare module "soundcloud" {
   export default SC;
 }
-import * as SC from "soundcloud";
+import * as SC from "soundcloud";*/
+
+declare var SC: any;
 
 /*
   Generated class for the LikedPage page.
@@ -17,6 +19,7 @@ import * as SC from "soundcloud";
   See http://ionicframework.com/docs/v2/components/#navigation for more info on
   Ionic pages and navigation.
 */
+
 @Page({
   templateUrl: 'build/pages/liked/liked.html',
   providers: [AuthProvider, HTTP_PROVIDERS],

@@ -1,9 +1,11 @@
 import {Injectable} from '@angular/core';
 
-declare module "soundcloud" {
+/*declare module "soundcloud" {
   export let SC: any;
 }
-import * as SC from "soundcloud";
+import * as SC from "soundcloud";*/
+
+declare var SC: any;
 
 
 /*

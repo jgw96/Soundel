@@ -3,7 +3,6 @@ import {NavController, Page, Tabs} from 'ionic-angular';
 import {HomePage} from '../home/home';
 import {LikedPage} from '../liked/liked';
 
-
 @Page({
   templateUrl: 'build/pages/tabs/tabs.html'
 })

@@ -4,10 +4,11 @@ import {Toast as NativeToast} from "ionic-native";
 
 import {HTTP_PROVIDERS} from "@angular/http";
 
-declare module "soundcloud" {
+/*declare module "soundcloud" {
   export default SC;
 }
-import * as SC from "soundcloud";
+import * as SC from "soundcloud";*/
+declare var SC: any;
 
 import {MusicService} from "../../providers/music-service/music-service";
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
