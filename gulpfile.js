@@ -51,7 +51,7 @@ gulp.task('build', ['clean'], function(done){
     ['sass', 'html', 'fonts', 'scripts'],
     function(){
       buildBrowserify({
-        src: ['./app/app.ts', './node_modules/zone.js/dist/zone.js', './node_modules/reflect-metadata/Reflect.js', './typings/main.d.ts'],
+        src: ['./app/app.ts', './typings/main.d.ts'],
         minify: isRelease,
         browserifyOptions: {
           debug: !isRelease
