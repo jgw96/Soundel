@@ -1,6 +1,3 @@
-import 'reflect-metadata';
-import 'zone.js/dist/zone';
-
 import {App, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 //import {HomePage} from './pages/home/home';

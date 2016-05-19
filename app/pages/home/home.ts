@@ -2,7 +2,7 @@ import {Page, Alert, NavController, Loading, Toast} from 'ionic-angular';
 import {Keyboard} from 'ionic-native';
 import {Toast as NativeToast} from "ionic-native";
 
-import {HTTP_PROVIDERS} from "@angular/http";
+import {HTTP_PROVIDERS} from '@angular/http';
 
 /*declare module "soundcloud" {
   export default SC;
