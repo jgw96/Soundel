@@ -233,7 +233,12 @@ export class HomePage {
       });
       this.nav.present(toast);
     }).catch((err) => {
-      alert(err);
+      let alert = Alert.create({
+        title: "Not logged in",
+        message: "You were not logged in.",
+        buttons: ["OK"]
+      })
+      this.nav.present(alert);
     })
   }
 
