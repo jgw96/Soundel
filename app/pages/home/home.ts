@@ -49,7 +49,6 @@ export class HomePage {
 
     this.nav.present(loading).then(() => {
       this.musicService.getFirstTracks().then((tracks) => {
-        console.log(tracks);
         this.songs = tracks;
         loading.dismiss();
       })
