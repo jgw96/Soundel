@@ -11,9 +11,6 @@ import {Injectable, Pipe} from '@angular/core';
 })
 @Injectable()
 export class ImagePipe {
-  /*
-    Takes a value and makes it lowercase.
-   */
   transform(value: string, args: any[]) {
     const fixedString = value.replace("large", "t500x500");
     return fixedString;

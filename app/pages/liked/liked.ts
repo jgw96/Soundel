@@ -6,11 +6,6 @@ import {Track} from "../../interfaces/track";
 import {ImagePipe} from "../../pipes/ImagePipe";
 import {Player} from "../../interfaces/player";
 
-/*declare module "soundcloud" {
-  export default SC;
-}
-import * as SC from "soundcloud";*/
-
 declare var SC: any;
 
 /*
@@ -44,7 +39,7 @@ export class LikedPage {
           {
             text: 'No',
             handler: data => {
-              
+
             }
           },
           {
@@ -52,6 +47,7 @@ export class LikedPage {
             handler: data => {
               this.authProvider.login().then((result) => {
                 prompt.dismiss().then(() => {
+                  this.loggedIn = true;
                   this.getLikedSongs();
                 })
               })
@@ -90,7 +86,7 @@ export class LikedPage {
 
   public play(id: string, songName: string, duration: number): void {
     if (this.toast !== undefined && this.toast._destroys.length === 1) {
-      this.toast.setMessage(`Currently playing ${songName}`)
+      this.toast.setMessage(`Playing ${songName}`)
 
       SC.stream(`/tracks/${id}`).then((player) => {
         player.play();
@@ -127,7 +123,7 @@ export class LikedPage {
         this.mainPlayer = player;
 
         this.toast = Toast.create({
-          message: `Currently playing ${songName}`,
+          message: `Playing ${songName}`,
           enableBackdropDismiss: false,
           showCloseButton: true,
           closeButtonText: "stop",

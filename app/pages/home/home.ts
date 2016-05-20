@@ -4,10 +4,6 @@ import {Toast as NativeToast} from "ionic-native";
 
 import {HTTP_PROVIDERS} from '@angular/http';
 
-/*declare module "soundcloud" {
-  export default SC;
-}
-import * as SC from "soundcloud";*/
 declare var SC: any;
 
 import {MusicService} from "../../providers/music-service/music-service";
@@ -107,7 +103,7 @@ export class HomePage {
 
   public play(id: string, songName: string, duration: number): void {
     if (this.toast !== undefined && this.toast._destroys.length === 1) {
-      this.toast.setMessage(`Currently playing ${songName}`)
+      this.toast.setMessage(`Playing ${songName}`)
 
       SC.stream(`/tracks/${id}`).then((player) => {
         player.play();
@@ -146,7 +142,7 @@ export class HomePage {
         this.mainPlayer = player;
 
         this.toast = Toast.create({
-          message: `Currently playing ${songName}`,
+          message: `Playing ${songName}`,
           enableBackdropDismiss: false,
           showCloseButton: true,
           closeButtonText: "stop",
@@ -235,7 +231,7 @@ export class HomePage {
     }).catch((err) => {
       let alert = Alert.create({
         title: "Not logged in",
-        message: "You were not logged in.",
+        message: `${err}`,
         buttons: ["OK"]
       })
       this.nav.present(alert);

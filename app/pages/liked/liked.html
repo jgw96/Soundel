@@ -13,7 +13,16 @@
     <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
     <div class="card-title">{{song.title}}</div>
     <div (click)="play(song.id, song.title, song.duration)" class="playButton">
-      <button>Play</button>
+      <button secondary>Play</button>
     </div>
+  </ion-card>
+  
+  <ion-card *ngIf="!loggedIn">
+    <ion-card-header>
+      Sorry
+    </ion-card-header>
+    <ion-card-content>
+      You must be logged in to see your favorites
+    </ion-card-content>
   </ion-card>
 </ion-content>
