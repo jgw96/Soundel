@@ -1,4 +1,4 @@
-import {Page, NavController, Toast, Alert, Loading} from 'ionic-angular';
+import {Page, NavController, Toast, Alert, Loading, Platform} from 'ionic-angular';
 import {HTTP_PROVIDERS} from "@angular/http";
 
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
@@ -27,10 +27,19 @@ export class LikedPage {
   private loading: Loading;
   private toast: Toast;
   public loggedIn: boolean;
-  
+  public isMD: boolean;
+
+  onPageLoaded() {
+    if (this.platform.is("android")) {
+      this.isMD = true;
+    }
+    else {
+      this.isMD = false;
+    }
+  }
 
   onPageDidEnter() {
-    
+
     if (this.authProvider.getToken() === null) {
       let prompt = Alert.create({
         title: 'Not logged in',
@@ -50,12 +59,19 @@ export class LikedPage {
                   this.loggedIn = true;
                   this.getLikedSongs();
                 })
+              }).catch((err) => {
+                let alert = Alert.create({
+                  title: "Not logged in",
+                  message: `${err}`,
+                  buttons: ["OK"]
+                })
+                this.nav.present(alert);
               })
             }
           }
         ]
       });
-      
+
       this.nav.present(prompt);
     }
     else {
@@ -63,7 +79,7 @@ export class LikedPage {
     }
 
   }
-  constructor(private nav: NavController, private authProvider: AuthProvider) { }
+  constructor(private nav: NavController, private authProvider: AuthProvider, private platform: Platform) { }
 
   private getLikedSongs() {
     let loading = Loading.create({
@@ -84,79 +100,104 @@ export class LikedPage {
     });
   }
 
-  public play(id: string, songName: string, duration: number): void {
+  private load(id: string, songName: string, duration: number): Promise<any> {
+
     if (this.toast !== undefined && this.toast._destroys.length === 1) {
-      this.toast.setMessage(`Playing ${songName}`)
+      return new Promise((resolve, reject) => {
+        this.toast.setMessage(`Playing ${songName}`)
 
-      SC.stream(`/tracks/${id}`).then((player) => {
-        player.play();
-        this.mainPlayer = player;
+        SC.stream(`/tracks/${id}`).then((player) => {
+          //player.play();
+          resolve(this.mainPlayer = player);
 
-        this.toast.onDismiss(() => {
-          this.pause();
-        })
-
-        //set up events
-        player.on("finish", () => {
-          this.toast.dismiss().then(() => {
-            //hacky workaround
-            this.toast.dismiss();
-
-            this.songDone();
+          this.toast.onDismiss(() => {
+            this.pause();
           })
-        });
 
-        player.on("audio_error", () => {
-          this.audioError();
+          //set up events
+          player.on("finish", () => {
+            this.toast.dismiss().then(() => {
+              //hacky workaround
+              this.toast.dismiss();
+
+              this.songDone();
+            })
+          });
+
+          player.on("audio_error", () => {
+            this.audioError();
+          });
+          player.on("no_connection", () => {
+            this.audioError();
+          });
+          player.on("no_streams", () => {
+            this.audioError();
+          });
         });
-        player.on("no_connection", () => {
-          this.audioError();
-        });
-        player.on("no_streams", () => {
-          this.audioError();
-        });
-      });
+      })
+
     }
     else {
-      SC.stream(`/tracks/${id}`).then((player) => {
-        player.play();
-        this.mainPlayer = player;
+      return new Promise((resolve, reject) => {
+        SC.stream(`/tracks/${id}`, {
+          useHTML5Audio: true,
+          preferFlash: false
+        }).then((player) => {
+          console.log(player);
+          //player.play();
+          resolve(this.mainPlayer = player);
 
-        this.toast = Toast.create({
-          message: `Playing ${songName}`,
-          enableBackdropDismiss: false,
-          showCloseButton: true,
-          closeButtonText: "stop",
-          dismissOnPageChange: false
-        });
+          this.toast = Toast.create({
+            message: `Playing ${songName}`,
+            enableBackdropDismiss: false,
+            showCloseButton: true,
+            closeButtonText: "stop",
+            dismissOnPageChange: false
+          });
 
-        this.nav.present(this.toast);
-
-        this.toast.onDismiss(() => {
-          this.pause();
-        })
-
-        //set up events
-        player.on("finish", () => {
-          this.toast.dismiss().then(() => {
-            //hacky workaround
-            this.toast.dismiss();
-
-            this.songDone();
+          this.toast.onDismiss(() => {
+            this.pause();
           })
-        });
 
-        player.on("audio_error", () => {
-          this.audioError();
-        });
-        player.on("no_connection", () => {
-          this.audioError();
-        });
-        player.on("no_streams", () => {
-          this.audioError();
+          //set up events
+          player.on("finish", () => {
+            this.toast.dismiss().then(() => {
+              //hacky workaround
+              this.toast.dismiss();
+
+              this.songDone();
+            })
+          });
+
+          player.on("audio_error", () => {
+            this.audioError();
+          });
+          player.on("no_connection", () => {
+            this.audioError();
+          });
+          player.on("no_streams", () => {
+            this.audioError();
+          });
+
         });
       });
     }
+
+  }
+
+  public play(id: string, songName: string, duration: number): void {
+    let loading = Loading.create({
+      content: "Buffering..."
+    });
+    this.nav.present(loading).then(() => {
+      this.load(id, songName, duration).then((song) => {
+        song.play();
+        setTimeout(() => {
+          loading.dismiss();
+        }, 700)
+      })
+
+    })
   }
 
   public pause(): void {

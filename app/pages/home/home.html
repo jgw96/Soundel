@@ -1,4 +1,4 @@
-<ion-navbar primary *navbar>
+<ion-navbar [attr.primary]="isMD ? '' : null" *navbar>
   <ion-buttons start showWhen="ios">
     <button (click)="search()">
       <ion-icon name="search"></ion-icon>
@@ -25,7 +25,7 @@
     <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
       <button secondary id="likeButton">Like</button>
     </div>
-    <div (click)="play(song.id, song.title, song.duration)" class="playButton">
+    <div (touchend)="play(song.id, song.title, song.duration)" class="playButton">
       <button secondary>Play</button>
     </div>
   </ion-card>

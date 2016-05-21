@@ -5,7 +5,7 @@ import {TabsPage} from "./pages/tabs/tabs";
 import {enableProdMode} from '@angular/core'
 import 'rxjs/Rx';
 
-enableProdMode();
+//enableProdMode();
 
 @App({
   template: '<ion-nav [root]="rootPage"></ion-nav>',
