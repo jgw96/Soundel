@@ -10,6 +10,9 @@
 
 <ion-content class="liked">
   <ion-card id="songCard" [hidden]="song.artwork_url === null" *ngFor="let song of songs">
+    <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
+      <ion-icon name="share"></ion-icon>
+    </button>
     <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
     <div class="card-title">{{song.title}}</div>
     <div (click)="play(song.id, song.title, song.duration)" class="playButton">

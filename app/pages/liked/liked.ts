@@ -1,4 +1,5 @@
 import {Page, NavController, Toast, Alert, Loading, Platform} from 'ionic-angular';
+import {SocialSharing} from 'ionic-native';
 import {HTTP_PROVIDERS} from "@angular/http";
 
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
@@ -234,6 +235,10 @@ export class LikedPage {
     });
 
     this.nav.present(confirm);
+  }
+  
+  public share(songUrl: string) {
+    SocialSharing.share("Check out what im listening too!", null, null, songUrl);
   }
 
   private audioError(): void {

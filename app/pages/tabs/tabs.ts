@@ -2,6 +2,7 @@ import {NavController, Page, Tabs, Platform} from 'ionic-angular';
 
 import {HomePage} from '../home/home';
 import {LikedPage} from '../liked/liked';
+import {SettingsPage} from "../settings/settings";
 
 @Page({
   templateUrl: 'build/pages/tabs/tabs.html'
@@ -10,6 +11,7 @@ export class TabsPage {
   
   public tab1Root: any;
   public tab2Root: any;
+  public tab3Root: any;
   public isMD: boolean;
   
   onPageLoaded() {
@@ -25,6 +27,7 @@ export class TabsPage {
     // set the root pages for each tab
     this.tab1Root = HomePage;
     this.tab2Root = LikedPage;
+    this.tab3Root = SettingsPage;
   }
 
 }

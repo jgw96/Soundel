@@ -1,8 +1,11 @@
 import {Page, Alert, NavController, Loading, Toast, Platform} from 'ionic-angular';
 import {Keyboard} from 'ionic-native';
 import {Toast as NativeToast} from "ionic-native";
+import {SocialSharing} from 'ionic-native';
 
 import {HTTP_PROVIDERS} from '@angular/http';
+
+import * as localforage from "localforage";
 
 declare var SC: any;
 
@@ -58,10 +61,21 @@ export class HomePage {
     });
 
     this.nav.present(loading).then(() => {
-      this.musicService.getFirstTracks().then((tracks) => {
-        this.songs = tracks;
-        console.log(tracks);
-        loading.dismiss();
+      localforage.getItem("defaultSearch").then((value) => {
+        if (value === null) {
+          this.musicService.getFirstTracks("Tame Impala").then((tracks) => {
+            console.log(tracks);
+            this.songs = tracks;
+            loading.dismiss();
+          })
+        }
+        else {
+          this.musicService.getFirstTracks(value).then((tracks) => {
+            console.log(tracks);
+            this.songs = tracks;
+            loading.dismiss();
+          })
+        }
       })
     });
 
@@ -300,6 +314,10 @@ export class HomePage {
       },
       error => alert(error)
       )
+  }
+  
+  public share(songUrl: string) {
+    SocialSharing.share("Check out what im listening too!", null, null, songUrl);
   }
 
   private audioError(): void {

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 
 declare var SC: any;
 
-
+import * as localforage from "localforage";
 /*
   Generated class for the MusicService provider.
 
@@ -21,18 +21,20 @@ export class MusicService {
       client_id: "152f0d7acb02ac226e43133ece32b7ac"
     });
   }
-  
-  public getFirstTracks(): any {
+
+  public getFirstTracks(value: string): any {
     return SC.get("/tracks", {
-      q: "Tame Impala",
+      q: value,
       streamable: true,
       limit: 30
     })
   }
-  
+
   public getTracks(term: string) {
     return SC.get("/tracks", {
-      q: term
+      q: term,
+      streamable: true,
+      limit: 30
     });
   }
 
