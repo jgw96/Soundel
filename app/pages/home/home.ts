@@ -8,6 +8,7 @@ import {HTTP_PROVIDERS} from '@angular/http';
 import * as localforage from "localforage";
 
 declare var SC: any;
+declare var shake: any;
 
 import {MusicService} from "../../providers/music-service/music-service";
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
@@ -80,6 +81,18 @@ export class HomePage {
     });
 
     this.toastOpen = false;
+
+    shake.startWatch(() => {
+      const maxMatches = 1;
+      const promptString = "What would you like to listen too";
+      window.plugins.speechrecognizer.startRecognize((data) => {
+        this.musicService.getTracks(data[0]).then((tracks) => {
+          this.songs = tracks;
+        })
+      }, (error) => {
+        console.log(error);
+      }, maxMatches, promptString);
+    })
 
   }
 
@@ -315,7 +328,7 @@ export class HomePage {
       error => alert(error)
       )
   }
-  
+
   public share(songUrl: string) {
     SocialSharing.share("Check out what im listening too!", null, null, songUrl);
   }
