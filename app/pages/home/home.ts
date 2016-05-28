@@ -9,9 +9,9 @@ import * as localforage from "localforage";
 
 declare var SC: any;
 declare var shake: any;
+declare var Howl: any;
 
 import {MusicService} from "../../providers/music-service/music-service";
-import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
 import {Player} from "../../interfaces/player";
 import {ImagePipe} from "../../pipes/ImagePipe";
@@ -19,12 +19,13 @@ import {ImagePipe} from "../../pipes/ImagePipe";
 
 @Page({
   templateUrl: 'build/pages/home/home.html',
-  providers: [MusicService, AuthProvider, HTTP_PROVIDERS],
+  providers: [MusicService, HTTP_PROVIDERS],
   pipes: [ImagePipe]
 })
 export class HomePage {
 
   public songs: Track[];
+  public secondSongs: Track[];
   public mainPlayer: Player;
   private loading: Loading;
   private toast: Toast;
@@ -32,21 +33,15 @@ export class HomePage {
   public avatar: string
   private toastOpen: boolean;
   public isMD: boolean;
+  private localSound: any;
 
-  constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider, private platform: Platform) {
+  constructor(private nav: NavController, private musicService: MusicService, private platform: Platform) {
   }
 
-  private onPageDidEnter(): void {
-
-    if (this.authService.getToken() !== null) {
-      this.loggedIn = true;
-      this.avatar = this.authService.getAvatar();
-    }
-  }
 
   private onPageLoaded(): void {
 
-    if (this.platform.is("android")) {
+    if (this.platform.is("android") || this.platform.is("core")) {
       this.isMD = true;
     }
     else {
@@ -66,14 +61,30 @@ export class HomePage {
         if (value === null) {
           this.musicService.getFirstTracks("Tame Impala").then((tracks) => {
             console.log(tracks);
-            this.songs = tracks;
+
+            let half = Math.ceil(tracks.length / 2);
+            let leftSide = tracks.splice(0, half);
+
+            this.songs = leftSide;
+            this.secondSongs = tracks;
+
+            console.log(this.songs);
+            console.log(this.secondSongs);
+
             loading.dismiss();
           })
         }
         else {
           this.musicService.getFirstTracks(value).then((tracks) => {
             console.log(tracks);
-            this.songs = tracks;
+            let half = Math.ceil(tracks.length / 2);
+            let leftSide = tracks.splice(0, half);
+
+            this.songs = leftSide;
+            this.secondSongs = tracks;
+
+            console.log(this.songs);
+            console.log(this.secondSongs);
             loading.dismiss();
           })
         }
@@ -81,19 +92,55 @@ export class HomePage {
     });
 
     this.toastOpen = false;
+    
+    this.playLocalMusic();
+  }
 
-    shake.startWatch(() => {
-      const maxMatches = 1;
-      const promptString = "What would you like to listen too";
-      window.plugins.speechrecognizer.startRecognize((data) => {
-        this.musicService.getTracks(data[0]).then((tracks) => {
-          this.songs = tracks;
+  public playLocalMusic(): void {
+    const body = <HTMLBodyElement>document.querySelector("body");
+
+    //dirty hack i have to do
+    window.ondragover = (e) => {
+      e.preventDefault(); return false
+    };
+    window.ondrop = (e): any => {
+      e.preventDefault();
+      return false;
+    };
+
+    body.ondrop = (e) => {
+      e.preventDefault();
+      let file = e.dataTransfer.files[0];
+      console.log(file);
+
+      this.localSound = new Howl({
+        urls: [file.path]
+      }).play();
+
+      if (this.toast !== undefined && this.toast._destroys.length === 1) {
+        this.toast.setMessage(`Playing ${file.name}`);
+
+        this.toast.onDismiss(() => {
+          this.localSound.unload();
         })
-      }, (error) => {
-        console.log(error);
-      }, maxMatches, promptString);
-    })
+      }
+      else {
+        this.toast = Toast.create({
+          message: `Playing ${file.name}`,
+          enableBackdropDismiss: false,
+          showCloseButton: true,
+          closeButtonText: "stop",
+          dismissOnPageChange: false
+        });
+        this.nav.present(this.toast);
 
+        this.toast.onDismiss(() => {
+          this.localSound.unload();
+        })
+      }
+
+      return false;
+    }
   }
 
   public search(): void {
@@ -125,7 +172,14 @@ export class HomePage {
 
             this.nav.present(loading).then(() => {
               this.musicService.getTracks(data.term).then((tracks) => {
-                this.songs = tracks;
+                let half = Math.ceil(tracks.length / 2);
+                let leftSide = tracks.splice(0, half);
+
+                this.songs = leftSide;
+                this.secondSongs = tracks;
+
+                console.log(this.songs);
+                console.log(this.secondSongs);
                 loading.dismiss();
               });
             });
@@ -235,6 +289,11 @@ export class HomePage {
       content: "Buffering..."
     });
     this.nav.present(loading).then(() => {
+
+      if (this.localSound) {
+        this.localSound.unload();
+      }
+
       this.load(id, songName, duration).then((song) => {
         song.play();
         setTimeout(() => {
@@ -281,56 +340,9 @@ export class HomePage {
     this.nav.present(confirm);
   }
 
-  public login(): void {
-    this.authService.login().then((result) => {
-      console.log(result);
-      this.loggedIn = true;
-      this.avatar = result;
-
-      NativeToast.showShortBottom("Logged In")
-        .subscribe(
-        done => console.log("Done"),
-        error => console.log(error)
-        )
-
-    }).catch((err) => {
-      let alert = Alert.create({
-        title: "Not logged in",
-        message: `${err}`,
-        buttons: ["OK"]
-      })
-      this.nav.present(alert);
-    })
-  }
-
-  public like(id: string): void {
-    this.authService.likeTrack(id)
-      .subscribe(
-      data => {
-        console.log(data)
-
-        if (this.toastOpen === false) {
-          NativeToast.showShortBottom("Song Liked")
-            .subscribe(
-            done => console.log("done"),
-            error => console.log(error)
-            )
-        }
-        else {
-          NativeToast.showShortCenter("Song Liked")
-            .subscribe(
-            done => console.log("done"),
-            error => console.log(error)
-            )
-        }
-
-      },
-      error => alert(error)
-      )
-  }
-
   public share(songUrl: string) {
-    SocialSharing.share("Check out what im listening too!", null, null, songUrl);
+    //SocialSharing.share("Check out what im listening too!", null, null, songUrl);
+    window.open(`https://twitter.com/share?url=${songUrl}&text=Check out what im listening too!`)
   }
 
   private audioError(): void {

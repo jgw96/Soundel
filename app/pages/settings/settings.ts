@@ -69,32 +69,12 @@ export class SettingsPage {
 
   }
 
-  public screenAwake(): void {
-    console.log(this.screenStatus);
-    if (this.screenStatus === true) {
-      Insomnia.keepAwake().then(() => {
-        console.log("success");
-        Toast.showShortBottom("Screen will stay awake")
-          .subscribe(
-          done => console.log("Done"),
-          error => console.log(error)
-          )
-      })
-    }
-    else {
-      Insomnia.allowSleepAgain().then(() => {
-        Toast.showShortBottom("Screen settings normal now")
-          .subscribe(
-          done => console.log("Done"),
-          error => console.log(error)
-          )
-      })
-    }
+  private getMobileApp(): void {
+    window.open("https://play.google.com/store/apps/details?id=com.ionicframework.soundel680751&hl=en");
   }
-
-  public rateApp(): void {
-    AppRate.preferences.storeAppURL.android = 'market://details?id=com.ionicframework.soundel680751';
-    AppRate.promptForRating(true);
+  
+  private github(): void {
+    window.open("https://github.com/jgw96/Soundel");
   }
 
 }

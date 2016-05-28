@@ -7,33 +7,46 @@
   <ion-title>
     Soundel
   </ion-title>
-  <ion-buttons end>
-    <button [hidden]="!loggedIn">
-      <img class="avatarImage" src="{{avatar}}">
-    </button>
-    <button [hidden]="loggedIn" (click)="login()">
-      <ion-icon name="person"></ion-icon>
-    </button>
-  </ion-buttons>
 </ion-navbar>
 
 <ion-content class="home">
 
-  <ion-card [hidden]="song.artwork_url === null" *ngFor="let song of songs">
-    <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
-      <ion-icon name="share"></ion-icon>
-    </button>
-    <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
-    <div class="card-title">{{song.title}}</div>
-    <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
-      <button secondary id="likeButton">Like</button>
-    </div>
-    <div (touchend)="play(song.id, song.title, song.duration)" class="playButton">
-      <button secondary>Play</button>
-    </div>
-  </ion-card>
+  <ion-grid>
+    <ion-row>
+      <ion-col width-50>
+        <ion-card *ngFor="let song of songs" [hidden]="song.artwork_url === null">
+          <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
+            <ion-icon name="share"></ion-icon>
+          </button>
+          <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
+          <div class="card-title">{{song.title}}</div>
+          <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
+            <button secondary id="likeButton">Like</button>
+          </div>
+          <div (click)="play(song.id, song.title, song.duration)" class="playButton">
+            <button secondary>Play</button>
+          </div>
+        </ion-card>
+      </ion-col>
+      <ion-col width-50>
+        <ion-card *ngFor="let song of secondSongs" [hidden]="song.artwork_url === null">
+          <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
+            <ion-icon name="share"></ion-icon>
+          </button>
+          <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
+          <div class="card-title">{{song.title}}</div>
+          <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
+            <button secondary id="likeButton">Like</button>
+          </div>
+          <div (click)="play(song.id, song.title, song.duration)" class="playButton">
+            <button secondary>Play</button>
+          </div>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <button showWhen="android" (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
+  <button (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
     <ion-icon name="search"></ion-icon>
   </button>
 
