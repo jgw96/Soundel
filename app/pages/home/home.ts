@@ -1,4 +1,5 @@
-import {Page, Alert, NavController, Loading, Toast, Platform} from 'ionic-angular';
+import {Component} from "@angular/core";
+import {Alert, NavController, Loading, Toast, Platform, Popover, ActionSheet} from 'ionic-angular';
 import {Keyboard} from 'ionic-native';
 import {Toast as NativeToast} from "ionic-native";
 import {SocialSharing} from 'ionic-native';
@@ -15,9 +16,10 @@ import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
 import {Player} from "../../interfaces/player";
 import {ImagePipe} from "../../pipes/ImagePipe";
+import {LoginPage} from "../../pages/login/login";
 
 
-@Page({
+@Component({
   templateUrl: 'build/pages/home/home.html',
   providers: [MusicService, AuthProvider, HTTP_PROVIDERS],
   pipes: [ImagePipe]
@@ -36,7 +38,7 @@ export class HomePage {
   constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider, private platform: Platform) {
   }
 
-  private onPageDidEnter(): void {
+  private ionViewDidEnter(): void {
 
     if (this.authService.getToken() !== null) {
       this.loggedIn = true;
@@ -44,7 +46,7 @@ export class HomePage {
     }
   }
 
-  private onPageLoaded(): void {
+  private ionViewLoaded(): void {
 
     if (this.platform.is("android")) {
       this.isMD = true;
@@ -65,14 +67,12 @@ export class HomePage {
       localforage.getItem("defaultSearch").then((value) => {
         if (value === null) {
           this.musicService.getFirstTracks("Tame Impala").then((tracks) => {
-            console.log(tracks);
             this.songs = tracks;
             loading.dismiss();
           })
         }
         else {
           this.musicService.getFirstTracks(value).then((tracks) => {
-            console.log(tracks);
             this.songs = tracks;
             loading.dismiss();
           })
@@ -138,6 +138,39 @@ export class HomePage {
     this.nav.present(prompt);
   }
 
+  private options(songUrl: string, userUrl: string): void {
+
+    let actions = ActionSheet.create({
+      title: "Actions",
+      buttons: [
+        {
+          text: "Visit on SoundCloud",
+          icon: "link",
+          handler: () => {
+            window.open(songUrl);
+          }
+        },
+        {
+          text: "See who posted",
+          icon: "person",
+          handler: () => {
+            window.open(userUrl);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          icon: "close",
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    })
+
+    this.nav.present(actions);
+  }
+
   private load(id: string, songName: string, duration: number): Promise<any> {
 
     if (this.toast !== undefined && this.toast._destroys.length === 1) {
@@ -189,7 +222,6 @@ export class HomePage {
 
           this.toast = Toast.create({
             message: `Playing ${songName}`,
-            enableBackdropDismiss: false,
             showCloseButton: true,
             closeButtonText: "stop",
             dismissOnPageChange: false
@@ -281,26 +313,33 @@ export class HomePage {
     this.nav.present(confirm);
   }
 
-  public login(): void {
-    this.authService.login().then((result) => {
-      console.log(result);
-      this.loggedIn = true;
-      this.avatar = result;
+  public login(myEvent: Event): void {
 
-      NativeToast.showShortBottom("Logged In")
-        .subscribe(
-        done => console.log("Done"),
-        error => console.log(error)
-        )
+    let popover = Popover.create(LoginPage);
+    this.nav.present(popover, {
+      ev: myEvent
+    });
 
-    }).catch((err) => {
-      let alert = Alert.create({
-        title: "Not logged in",
-        message: `${err}`,
-        buttons: ["OK"]
-      })
-      this.nav.present(alert);
+    popover.onDismiss(() => {
+      if (sessionStorage.getItem("loginAvatar") !== null) {
+        this.loggedIn = true;
+        this.avatar = sessionStorage.getItem("loginAvatar");
+
+        NativeToast.showShortBottom("Logged In")
+          .subscribe(
+          done => console.log("Done"),
+          error => console.log(error)
+          )
+      }
+      else {
+        NativeToast.showShortBottom("Not logged in")
+          .subscribe(
+          done => console.log("done"),
+          error => console.log(error)
+          )
+      }
     })
+
   }
 
   public like(id: string): void {

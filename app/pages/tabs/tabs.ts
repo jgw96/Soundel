@@ -1,10 +1,11 @@
-import {NavController, Page, Tabs, Platform} from 'ionic-angular';
+import {Component} from "@angular/core";
+import {NavController, Tabs, Platform} from 'ionic-angular';
 
 import {HomePage} from '../home/home';
 import {LikedPage} from '../liked/liked';
 import {SettingsPage} from "../settings/settings";
 
-@Page({
+@Component({
   templateUrl: 'build/pages/tabs/tabs.html'
 })
 export class TabsPage {
@@ -14,7 +15,7 @@ export class TabsPage {
   public tab3Root: any;
   public isMD: boolean;
   
-  onPageLoaded() {
+  ionViewLoaded() {
     if (this.platform.is("android")) {
       this.isMD = true;
     }

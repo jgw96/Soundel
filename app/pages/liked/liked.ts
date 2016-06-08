@@ -1,4 +1,5 @@
-import {Page, NavController, Toast, Alert, Loading, Platform} from 'ionic-angular';
+import {Component} from "@angular/core";
+import {NavController, Toast, Alert, Loading, Platform} from 'ionic-angular';
 import {SocialSharing} from 'ionic-native';
 import {HTTP_PROVIDERS} from "@angular/http";
 
@@ -16,7 +17,7 @@ declare var SC: any;
   Ionic pages and navigation.
 */
 
-@Page({
+@Component({
   templateUrl: 'build/pages/liked/liked.html',
   providers: [AuthProvider, HTTP_PROVIDERS],
   pipes: [ImagePipe]
@@ -30,7 +31,7 @@ export class LikedPage {
   public loggedIn: boolean;
   public isMD: boolean;
 
-  onPageLoaded() {
+  ionViewLoaded() {
     if (this.platform.is("android")) {
       this.isMD = true;
     }
@@ -39,7 +40,7 @@ export class LikedPage {
     }
   }
 
-  onPageDidEnter() {
+  ionViewDidEnter() {
 
     if (this.authProvider.getToken() === null) {
       let prompt = Alert.create({
@@ -150,7 +151,6 @@ export class LikedPage {
 
           this.toast = Toast.create({
             message: `Playing ${songName}`,
-            enableBackdropDismiss: false,
             showCloseButton: true,
             closeButtonText: "stop",
             dismissOnPageChange: false

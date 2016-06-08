@@ -11,7 +11,7 @@
     <button [hidden]="!loggedIn">
       <img class="avatarImage" src="{{avatar}}">
     </button>
-    <button [hidden]="loggedIn" (click)="login()">
+    <button [hidden]="loggedIn" (click)="login($event)">
       <ion-icon name="person"></ion-icon>
     </button>
   </ion-buttons>
@@ -23,7 +23,7 @@
     <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
       <ion-icon name="share"></ion-icon>
     </button>
-    <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
+    <img (click)="options(song.permalink_url, song.user.permalink_url)" *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
     <div class="card-title">{{song.title}}</div>
     <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
       <button secondary id="likeButton">Like</button>

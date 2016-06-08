@@ -1,4 +1,5 @@
-import {Page, NavController, Alert} from 'ionic-angular';
+import {Component} from "@angular/core";
+import {NavController, Alert} from 'ionic-angular';
 import {Toast} from "ionic-native";
 import {Insomnia} from "ionic-native";
 import {AppRate} from 'ionic-native';
@@ -11,7 +12,7 @@ import * as localforage from "localforage";
   See http://ionicframework.com/docs/v2/components/#navigation for more info on
   Ionic pages and navigation.
 */
-@Page({
+@Component({
   templateUrl: 'build/pages/settings/settings.html',
 })
 export class SettingsPage {
@@ -19,7 +20,7 @@ export class SettingsPage {
   public defaultSearch: string;
   screenStatus: boolean;
 
-  onPageDidEnter(): void {
+  ionViewDidEnter(): void {
     localforage.getItem("defaultSearch").then((value) => {
       console.log(value);
       if (value === null) {
@@ -56,7 +57,6 @@ export class SettingsPage {
           text: 'Save',
           handler: data => {
             localforage.setItem("defaultSearch", data.term).then((value) => {
-              console.log(value);
               this.defaultSearch = value;
             }).catch((err) => {
               console.log(err);
