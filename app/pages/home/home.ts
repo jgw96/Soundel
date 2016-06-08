@@ -1,22 +1,18 @@
 import {Component} from "@angular/core";
-import {Alert, NavController, Loading, Toast, Platform, Popover, ActionSheet} from 'ionic-angular';
-import {Keyboard} from 'ionic-native';
-import {Toast as NativeToast} from "ionic-native";
-import {SocialSharing} from 'ionic-native';
-
 import {HTTP_PROVIDERS} from '@angular/http';
+import {Alert, NavController, Loading, Toast, Platform, Popover, ActionSheet} from 'ionic-angular';
+import {Keyboard, Toast as NativeToast, SocialSharing} from 'ionic-native';
 
 import * as localforage from "localforage";
-
-declare var SC: any;
-declare var shake: any;
-
 import {MusicService} from "../../providers/music-service/music-service";
 import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
 import {Player} from "../../interfaces/player";
 import {ImagePipe} from "../../pipes/ImagePipe";
 import {LoginPage} from "../../pages/login/login";
+
+declare var SC: any;
+declare var shake: any;
 
 
 @Component({
@@ -33,13 +29,11 @@ export class HomePage {
   public loggedIn: boolean;
   public avatar: string
   private toastOpen: boolean;
-  public isMD: boolean;
 
   constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider, private platform: Platform) {
   }
 
   private ionViewDidEnter(): void {
-
     if (this.authService.getToken() !== null) {
       this.loggedIn = true;
       this.avatar = this.authService.getAvatar();
@@ -47,13 +41,6 @@ export class HomePage {
   }
 
   private ionViewLoaded(): void {
-
-    if (this.platform.is("android")) {
-      this.isMD = true;
-    }
-    else {
-      this.isMD = false;
-    }
 
     this.musicService.init();
 
@@ -96,7 +83,7 @@ export class HomePage {
 
   }
 
-  public search(): void {
+  private search(): void {
 
     let prompt = Alert.create({
       title: 'Search',
@@ -166,7 +153,7 @@ export class HomePage {
           }
         }
       ]
-    })
+    });
 
     this.nav.present(actions);
   }
@@ -262,7 +249,7 @@ export class HomePage {
 
   }
 
-  public play(id: string, songName: string, duration: number): void {
+  private play(id: string, songName: string, duration: number): void {
     let loading = Loading.create({
       content: "Buffering..."
     });
@@ -277,44 +264,22 @@ export class HomePage {
     })
   }
 
-  public pause(): void {
+  private pause(): void {
     this.mainPlayer.pause();
   }
 
   private songDone(): void {
-    let confirm = Alert.create({
-      title: 'Song finished',
-      message: 'Would you like to play a similar song?',
-      buttons: [
-        {
-          text: 'No',
-          handler: () => {
-            console.log('Disagree clicked');
-          }
-        },
-        {
-          text: 'Yes',
-          handler: () => {
-            console.log(this.songs);
-            const randNum: number = Math.floor((Math.random() * 9) + 0);
-            console.log(randNum);
+    const randNum: number = Math.floor(Math.random() * 9) + 0;
+    console.log(randNum);
 
-            this.play(
-              this.songs[randNum].id,
-              this.songs[randNum].title,
-              this.songs[randNum].duration
-            );
-
-          }
-        }
-      ]
-    });
-
-    this.nav.present(confirm);
+    this.play(
+      this.songs[randNum].id,
+      this.songs[randNum].title,
+      this.songs[randNum].duration
+    )
   }
 
-  public login(myEvent: Event): void {
-
+  private login(myEvent: Event): void {
     let popover = Popover.create(LoginPage);
     this.nav.present(popover, {
       ev: myEvent
@@ -342,7 +307,7 @@ export class HomePage {
 
   }
 
-  public like(id: string): void {
+  private like(id: string): void {
     this.authService.likeTrack(id)
       .subscribe(
       data => {
@@ -362,13 +327,12 @@ export class HomePage {
             error => console.log(error)
             )
         }
-
       },
       error => alert(error)
       )
   }
 
-  public share(songUrl: string) {
+  private share(songUrl: string): void {
     SocialSharing.share("Check out what im listening too!", null, null, songUrl);
   }
 

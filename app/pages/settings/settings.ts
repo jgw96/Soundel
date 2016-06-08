@@ -36,7 +36,7 @@ export class SettingsPage {
     this.screenStatus = false;
   }
 
-  public changeDefaultSearch(): void {
+  private changeDefaultSearch(): void {
     let prompt = Alert.create({
       title: 'Default Search',
       message: "This sets the default search for the first batch of songs that is shown.",
@@ -69,7 +69,7 @@ export class SettingsPage {
 
   }
 
-  public screenAwake(): void {
+  private screenAwake(): void {
     console.log(this.screenStatus);
     if (this.screenStatus === true) {
       Insomnia.keepAwake().then(() => {
@@ -92,7 +92,7 @@ export class SettingsPage {
     }
   }
 
-  public rateApp(): void {
+  private rateApp(): void {
     AppRate.preferences.storeAppURL.android = 'market://details?id=com.ionicframework.soundel680751';
     AppRate.promptForRating(true);
   }

@@ -29,16 +29,6 @@ export class LikedPage {
   private loading: Loading;
   private toast: Toast;
   public loggedIn: boolean;
-  public isMD: boolean;
-
-  ionViewLoaded() {
-    if (this.platform.is("android")) {
-      this.isMD = true;
-    }
-    else {
-      this.isMD = false;
-    }
-  }
 
   ionViewDidEnter() {
 
@@ -186,7 +176,7 @@ export class LikedPage {
 
   }
 
-  public play(id: string, songName: string, duration: number): void {
+  private play(id: string, songName: string, duration: number): void {
     let loading = Loading.create({
       content: "Buffering..."
     });
@@ -201,7 +191,7 @@ export class LikedPage {
     })
   }
 
-  public pause(): void {
+  private pause(): void {
     this.mainPlayer.pause();
   }
 
@@ -237,7 +227,7 @@ export class LikedPage {
     this.nav.present(confirm);
   }
   
-  public share(songUrl: string) {
+  private share(songUrl: string) {
     SocialSharing.share("Check out what im listening too!", null, null, songUrl);
   }
 

@@ -16,7 +16,7 @@ import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 export class LoginPage {
   constructor(public nav: NavController, private viewCtrl: ViewController, private authService: AuthProvider) {}
   
-  login() {
+  private login(): void {
     this.authService.login().then((result) => {
       console.log(result);
       
