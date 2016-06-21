@@ -1,9 +1,4 @@
 <ion-navbar primary *navbar>
-  <ion-buttons start showWhen="ios">
-    <button (click)="search()">
-      <ion-icon name="search"></ion-icon>
-    </button>
-  </ion-buttons>
   <ion-title>
     Soundel
   </ion-title>
@@ -33,7 +28,7 @@
     </div>
   </ion-card>
 
-  <button showWhen="android" (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
+  <button (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
     <ion-icon name="search"></ion-icon>
   </button>
 
