@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {NavController, Toast, Alert, Loading, Platform} from 'ionic-angular';
+import {NavController, ToastController, AlertController, LoadingController, Platform} from 'ionic-angular';
 import {SocialSharing} from 'ionic-native';
 import {HTTP_PROVIDERS} from "@angular/http";
 
@@ -26,14 +26,15 @@ export class LikedPage {
 
   public songs: Track[];
   public mainPlayer: Player;
-  private loading: Loading;
-  private toast: Toast;
+  private loading: LoadingController;
+  private toastOpen: boolean;
+  private toast: any;
   public loggedIn: boolean;
 
   ionViewDidEnter() {
 
     if (this.authProvider.getToken() === null) {
-      let prompt = Alert.create({
+      let prompt = this.alertCtrl.create({
         title: 'Not logged in',
         message: "You must be logged in to see your liked songs. Would you like to log in now?",
         buttons: [
@@ -52,33 +53,40 @@ export class LikedPage {
                   this.getLikedSongs();
                 })
               }).catch((err) => {
-                let alert = Alert.create({
+                let alert = this.alertCtrl.create({
                   title: "Not logged in",
                   message: `${err}`,
                   buttons: ["OK"]
                 })
-                this.nav.present(alert);
+                prompt.present();
               })
             }
           }
         ]
       });
 
-      this.nav.present(prompt);
+      prompt.present();
     }
     else {
       this.getLikedSongs();
     }
 
   }
-  constructor(private nav: NavController, private authProvider: AuthProvider, private platform: Platform) { }
+  constructor(
+    private nav: NavController, 
+    private authProvider: AuthProvider, 
+    private platform: Platform, 
+    private alertCtrl: AlertController, 
+    private loadCtrl: LoadingController, 
+    private toastCtrl: ToastController
+    ) { }
 
   private getLikedSongs() {
-    let loading = Loading.create({
+    let loading = this.loadCtrl.create({
       content: "Getting songs..."
     });
 
-    this.nav.present(loading).then(() => {
+    loading.present().then(() => {
       this.authProvider.getLiked()
         .subscribe(
         data => {
@@ -94,7 +102,8 @@ export class LikedPage {
 
   private load(id: string, songName: string, duration: number): Promise<any> {
 
-    if (this.toast !== undefined && this.toast._destroys.length === 1) {
+    if (this.toast !== undefined && this.toastOpen === true) {
+      console.log("toast is already here")
       return new Promise((resolve, reject) => {
         this.toast.setMessage(`Playing ${songName}`)
 
@@ -103,6 +112,7 @@ export class LikedPage {
           resolve(this.mainPlayer = player);
 
           this.toast.onDismiss(() => {
+            this.toastOpen = false;
             this.pause();
           })
 
@@ -111,6 +121,8 @@ export class LikedPage {
             this.toast.dismiss().then(() => {
               //hacky workaround
               this.toast.dismiss();
+
+              this.toastOpen = false;
 
               this.songDone();
             })
@@ -139,15 +151,21 @@ export class LikedPage {
           //player.play();
           resolve(this.mainPlayer = player);
 
-          this.toast = Toast.create({
+          this.toast = this.toastCtrl.create({
             message: `Playing ${songName}`,
             showCloseButton: true,
             closeButtonText: "stop",
             dismissOnPageChange: false
           });
 
-          this.toast.onDismiss(() => {
+          this.toast.present(this.toast).then(() => {
+            this.toastOpen = true;
+          });
+
+          this.toast.onDidDismiss(() => {
+            this.toastOpen = false;
             this.pause();
+            console.log(this.toast);
           })
 
           //set up events
@@ -155,6 +173,7 @@ export class LikedPage {
             this.toast.dismiss().then(() => {
               //hacky workaround
               this.toast.dismiss();
+              this.toastOpen = false;
 
               this.songDone();
             })
@@ -177,10 +196,10 @@ export class LikedPage {
   }
 
   private play(id: string, songName: string, duration: number): void {
-    let loading = Loading.create({
+    let loading = this.loadCtrl.create({
       content: "Buffering..."
     });
-    this.nav.present(loading).then(() => {
+    loading.present().then(() => {
       this.load(id, songName, duration).then((song) => {
         song.play();
         setTimeout(() => {
@@ -196,7 +215,7 @@ export class LikedPage {
   }
 
   private songDone(): void {
-    let confirm = Alert.create({
+    let confirm = this.alertCtrl.create({
       title: 'Song finished',
       message: 'Would you like to play a similar song?',
       buttons: [
@@ -224,7 +243,7 @@ export class LikedPage {
       ]
     });
 
-    this.nav.present(confirm);
+    confirm.present();
   }
   
   private share(songUrl: string) {
@@ -232,11 +251,11 @@ export class LikedPage {
   }
 
   private audioError(): void {
-    let alert = Alert.create({
+    let alert = this.alertCtrl.create({
       title: 'Error',
       subTitle: 'There was an error getting this song',
       buttons: ['OK']
     });
-    this.nav.present(alert);
+    alert.present();
   }
 }

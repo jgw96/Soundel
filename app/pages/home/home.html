@@ -1,16 +1,18 @@
-<ion-navbar primary *navbar>
-  <ion-title>
-    Soundel
-  </ion-title>
-  <ion-buttons end>
-    <button [hidden]="!loggedIn">
+<ion-header>
+  <ion-navbar primary>
+    <ion-title>
+      Soundel
+    </ion-title>
+    <ion-buttons end>
+      <button [hidden]="!loggedIn">
       <img class="avatarImage" src="{{avatar}}">
     </button>
-    <button [hidden]="loggedIn" (click)="login($event)">
+      <button [hidden]="loggedIn" (click)="login($event)">
       <ion-icon name="person"></ion-icon>
     </button>
-  </ion-buttons>
-</ion-navbar>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
 
 <ion-content class="home">
 
@@ -28,7 +30,7 @@
     </div>
   </ion-card>
 
-  <button (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
+  <button id="searchButton" (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
     <ion-icon name="search"></ion-icon>
   </button>
 

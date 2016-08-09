@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {HTTP_PROVIDERS} from '@angular/http';
-import {Alert, NavController, Loading, Toast, Platform, Popover, ActionSheet} from 'ionic-angular';
+import {NavController, ToastController, Platform, PopoverController, AlertController, LoadingController, ActionSheetController} from 'ionic-angular';
 import {Keyboard, Toast as NativeToast, SocialSharing} from 'ionic-native';
 
 import * as localforage from "localforage";
@@ -24,13 +24,23 @@ export class HomePage {
 
   public songs: Track[];
   public mainPlayer: Player;
-  private loading: Loading;
-  private toast: Toast;
+  private loading: LoadingController;
+  private toast: any;
   public loggedIn: boolean;
   public avatar: string
   private toastOpen: boolean;
 
-  constructor(private nav: NavController, private musicService: MusicService, private authService: AuthProvider, private platform: Platform) {
+  constructor(
+    private nav: NavController,
+    private musicService: MusicService,
+    private authService: AuthProvider,
+    private platform: Platform,
+    private alertCtrl: AlertController,
+    private loadCtrl: LoadingController,
+    private actionCtrl: ActionSheetController,
+    private popCtrl: PopoverController,
+    private toastCtrl: ToastController
+  ) {
   }
 
   private ionViewDidEnter(): void {
@@ -42,50 +52,52 @@ export class HomePage {
 
   private ionViewLoaded(): void {
 
-    this.musicService.init();
+    setTimeout(() => {
+      this.musicService.init();
 
-    this.loggedIn = false;
+      this.loggedIn = false;
 
-    let loading = Loading.create({
-      content: "Getting songs..."
-    });
+      let loading = this.loadCtrl.create({
+        content: "Getting songs..."
+      });
 
-    this.nav.present(loading).then(() => {
-      localforage.getItem("defaultSearch").then((value) => {
-        if (value === null) {
-          this.musicService.getFirstTracks("Tame Impala").then((tracks) => {
-            this.songs = tracks;
-            loading.dismiss();
-          })
-        }
-        else {
-          this.musicService.getFirstTracks(value).then((tracks) => {
-            this.songs = tracks;
-            loading.dismiss();
-          })
-        }
-      })
-    });
-
-    this.toastOpen = false;
-
-    shake.startWatch(() => {
-      const maxMatches = 1;
-      const promptString = "What would you like to listen too";
-      window.plugins.speechrecognizer.startRecognize((data) => {
-        this.musicService.getTracks(data[0]).then((tracks) => {
-          this.songs = tracks;
+      loading.present().then(() => {
+        localforage.getItem("defaultSearch").then((value) => {
+          if (value === null) {
+            this.musicService.getFirstTracks("Tame Impala").then((tracks) => {
+              this.songs = tracks;
+              loading.dismiss();
+            })
+          }
+          else {
+            this.musicService.getFirstTracks(value).then((tracks) => {
+              this.songs = tracks;
+              loading.dismiss();
+            })
+          }
         })
-      }, (error) => {
-        console.log(error);
-      }, maxMatches, promptString);
-    })
+      });
+
+      this.toastOpen = false;
+
+      shake.startWatch(() => {
+        const maxMatches = 1;
+        const promptString = "What would you like to listen too";
+        window.plugins.speechrecognizer.startRecognize((data) => {
+          this.musicService.getTracks(data[0]).then((tracks) => {
+            this.songs = tracks;
+          })
+        }, (error) => {
+          console.log(error);
+        }, maxMatches, promptString);
+      })
+    }, 500)
 
   }
 
   private search(): void {
 
-    let prompt = Alert.create({
+    let prompt = this.alertCtrl.create({
       title: 'Search',
       message: "Enter a genre, artist or anything!",
       inputs: [
@@ -106,11 +118,11 @@ export class HomePage {
           handler: data => {
             console.log('Saved clicked');
 
-            let loading = Loading.create({
+            let loading = this.loadCtrl.create({
               content: "Getting songs..."
             });
 
-            this.nav.present(loading).then(() => {
+            loading.present().then(() => {
               this.musicService.getTracks(data.term).then((tracks) => {
                 this.songs = tracks;
                 loading.dismiss();
@@ -122,12 +134,12 @@ export class HomePage {
       ]
     });
 
-    this.nav.present(prompt);
+    prompt.present();
   }
 
   private options(songUrl: string, userUrl: string): void {
 
-    let actions = ActionSheet.create({
+    let actions = this.actionCtrl.create({
       title: "Actions",
       buttons: [
         {
@@ -155,12 +167,13 @@ export class HomePage {
       ]
     });
 
-    this.nav.present(actions);
+    actions.present();
   }
 
   private load(id: string, songName: string, duration: number): Promise<any> {
 
-    if (this.toast !== undefined && this.toast._destroys.length === 1) {
+    if (this.toast !== undefined && this.toastOpen === true) {
+      console.log("toast is already here")
       return new Promise((resolve, reject) => {
         this.toast.setMessage(`Playing ${songName}`)
 
@@ -176,8 +189,7 @@ export class HomePage {
           //set up events
           player.on("finish", () => {
             this.toast.dismiss().then(() => {
-              //hacky workaround
-              this.toast.dismiss();
+
               this.toastOpen = false;
 
               this.songDone();
@@ -207,20 +219,21 @@ export class HomePage {
           //player.play();
           resolve(this.mainPlayer = player);
 
-          this.toast = Toast.create({
+          this.toast = this.toastCtrl.create({
             message: `Playing ${songName}`,
             showCloseButton: true,
             closeButtonText: "stop",
             dismissOnPageChange: false
           });
 
-          this.nav.present(this.toast).then(() => {
+          this.toast.present(this.toast).then(() => {
             this.toastOpen = true;
           });
 
           this.toast.onDismiss(() => {
             this.toastOpen = false;
             this.pause();
+            console.log(this.toast);
           })
 
           //set up events
@@ -228,6 +241,7 @@ export class HomePage {
             this.toast.dismiss().then(() => {
               //hacky workaround
               this.toast.dismiss();
+              this.toastOpen = false;
 
               this.songDone();
             })
@@ -250,10 +264,10 @@ export class HomePage {
   }
 
   private play(id: string, songName: string, duration: number): void {
-    let loading = Loading.create({
+    let loading = this.loadCtrl.create({
       content: "Buffering..."
     });
-    this.nav.present(loading).then(() => {
+    loading.present().then(() => {
       this.load(id, songName, duration).then((song) => {
         song.play();
         setTimeout(() => {
@@ -280,12 +294,12 @@ export class HomePage {
   }
 
   private login(myEvent: Event): void {
-    let popover = Popover.create(LoginPage);
-    this.nav.present(popover, {
+    let popover = this.popCtrl.create(LoginPage);
+    popover.present({
       ev: myEvent
     });
 
-    popover.onDismiss(() => {
+    popover.onDidDismiss(() => {
       if (sessionStorage.getItem("loginAvatar") !== null) {
         this.loggedIn = true;
         this.avatar = sessionStorage.getItem("loginAvatar");
@@ -337,12 +351,12 @@ export class HomePage {
   }
 
   private audioError(): void {
-    let alert = Alert.create({
+    let alert = this.alertCtrl.create({
       title: 'Error',
       subTitle: 'There was an error getting this song',
       buttons: ['OK']
     });
-    this.nav.present(alert);
+    alert.present();
   }
 
 }

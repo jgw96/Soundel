@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {NavController, Alert} from 'ionic-angular';
+import {NavController, AlertController} from 'ionic-angular';
 import {Toast} from "ionic-native";
 import {Insomnia} from "ionic-native";
 import {AppRate} from 'ionic-native';
@@ -32,12 +32,12 @@ export class SettingsPage {
     })
   }
 
-  constructor(public nav: NavController) {
+  constructor(public nav: NavController, private alertCtrl: AlertController) {
     this.screenStatus = false;
   }
 
   private changeDefaultSearch(): void {
-    let prompt = Alert.create({
+    let prompt = this.alertCtrl.create({
       title: 'Default Search',
       message: "This sets the default search for the first batch of songs that is shown.",
       inputs: [
@@ -65,7 +65,7 @@ export class SettingsPage {
         }
       ]
     });
-    this.nav.present(prompt);
+    prompt.present();
 
   }
 
