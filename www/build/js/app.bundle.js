@@ -82,11 +82,19 @@ var HomePage = (function () {
                     if (value === null) {
                         _this.musicService.getFirstTracks("Tame Impala").then(function (tracks) {
                             _this.songs = tracks;
+                            console.log(tracks);
+                            SC.stream("/tracks/" + tracks[0].id).then(function (player) {
+                                _this.initSong = player;
+                            });
                             loading.dismiss();
                         });
                     }
                     else {
                         _this.musicService.getFirstTracks(value).then(function (tracks) {
+                            console.log(tracks);
+                            SC.stream("/tracks/" + tracks[0].id).then(function (player) {
+                                _this.initSong = player;
+                            });
                             _this.songs = tracks;
                             loading.dismiss();
                         });
@@ -242,11 +250,16 @@ var HomePage = (function () {
     };
     HomePage.prototype.play = function (id, songName, duration) {
         var _this = this;
+        this.initSong.play();
+        setTimeout(function () {
+            _this.initSong.pause();
+        }, 50);
         var loading = this.loadCtrl.create({
             content: "Buffering..."
         });
         loading.present().then(function () {
             _this.load(id, songName, duration).then(function (song) {
+                console.log(song);
                 song.play();
                 setTimeout(function () {
                     loading.dismiss();
