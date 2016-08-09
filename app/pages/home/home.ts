@@ -1,15 +1,12 @@
 import {Component} from "@angular/core";
 import {HTTP_PROVIDERS} from '@angular/http';
 import {NavController, ToastController, Platform, PopoverController, AlertController, LoadingController, ActionSheetController} from 'ionic-angular';
-import {Keyboard, Toast as NativeToast, SocialSharing} from 'ionic-native';
 
 import * as localforage from "localforage";
 import {MusicService} from "../../providers/music-service/music-service";
-import {AuthProvider} from "../../providers/auth-provider/auth-provider";
 import {Track} from "../../interfaces/track";
 import {Player} from "../../interfaces/player";
 import {ImagePipe} from "../../pipes/ImagePipe";
-import {LoginPage} from "../../pages/login/login";
 
 declare var SC: any;
 declare var shake: any;
@@ -17,7 +14,7 @@ declare var shake: any;
 
 @Component({
   templateUrl: 'build/pages/home/home.html',
-  providers: [MusicService, AuthProvider, HTTP_PROVIDERS],
+  providers: [MusicService, HTTP_PROVIDERS],
   pipes: [ImagePipe]
 })
 export class HomePage {
@@ -33,7 +30,6 @@ export class HomePage {
   constructor(
     private nav: NavController,
     private musicService: MusicService,
-    private authService: AuthProvider,
     private platform: Platform,
     private alertCtrl: AlertController,
     private loadCtrl: LoadingController,
@@ -44,10 +40,7 @@ export class HomePage {
   }
 
   private ionViewDidEnter(): void {
-    if (this.authService.getToken() !== null) {
-      this.loggedIn = true;
-      this.avatar = this.authService.getAvatar();
-    }
+
   }
 
   private ionViewLoaded(): void {
@@ -79,18 +72,6 @@ export class HomePage {
       });
 
       this.toastOpen = false;
-
-      shake.startWatch(() => {
-        const maxMatches = 1;
-        const promptString = "What would you like to listen too";
-        window.plugins.speechrecognizer.startRecognize((data) => {
-          this.musicService.getTracks(data[0]).then((tracks) => {
-            this.songs = tracks;
-          })
-        }, (error) => {
-          console.log(error);
-        }, maxMatches, promptString);
-      })
     }, 500)
 
   }
@@ -123,7 +104,7 @@ export class HomePage {
             });
 
             loading.present().then(() => {
-              this.musicService.getTracks(data.term).then((tracks) => {
+              this.musicService.getFirstTracks(data.term).then((tracks) => {
                 this.songs = tracks;
                 loading.dismiss();
               });
@@ -293,61 +274,8 @@ export class HomePage {
     )
   }
 
-  private login(myEvent: Event): void {
-    let popover = this.popCtrl.create(LoginPage);
-    popover.present({
-      ev: myEvent
-    });
-
-    popover.onDidDismiss(() => {
-      if (sessionStorage.getItem("loginAvatar") !== null) {
-        this.loggedIn = true;
-        this.avatar = sessionStorage.getItem("loginAvatar");
-
-        NativeToast.showShortBottom("Logged In")
-          .subscribe(
-          done => console.log("Done"),
-          error => console.log(error)
-          )
-      }
-      else {
-        NativeToast.showShortBottom("Not logged in")
-          .subscribe(
-          done => console.log("done"),
-          error => console.log(error)
-          )
-      }
-    })
-
-  }
-
-  private like(id: string): void {
-    this.authService.likeTrack(id)
-      .subscribe(
-      data => {
-        console.log(data)
-
-        if (this.toastOpen === false) {
-          NativeToast.showShortBottom("Song Liked")
-            .subscribe(
-            done => console.log("done"),
-            error => console.log(error)
-            )
-        }
-        else {
-          NativeToast.showShortCenter("Song Liked")
-            .subscribe(
-            done => console.log("done"),
-            error => console.log(error)
-            )
-        }
-      },
-      error => alert(error)
-      )
-  }
-
   private share(songUrl: string): void {
-    SocialSharing.share("Check out what im listening too!", null, null, songUrl);
+    window.open(`https://twitter.com/share?url=${songUrl}&text=Check out what im listening too!`)
   }
 
   private audioError(): void {

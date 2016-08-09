@@ -3,35 +3,27 @@
     <ion-title>
       Soundel
     </ion-title>
-    <ion-buttons end>
-      <button [hidden]="!loggedIn">
-      <img class="avatarImage" src="{{avatar}}">
-    </button>
-      <button [hidden]="loggedIn" (click)="login($event)">
-      <ion-icon name="person"></ion-icon>
-    </button>
-    </ion-buttons>
   </ion-navbar>
-</ion-header>
+  </ion-header>
 
-<ion-content class="home">
+  <ion-content class="home">
 
-  <ion-card [hidden]="song.artwork_url === null" *ngFor="let song of songs">
-    <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
-      <ion-icon name="share"></ion-icon>
+    <ion-card *ngFor="let song of songs" [hidden]="song.artwork_url === null">
+      <button (click)="share(song.permalink_url)" secondary id="shareButton" clear>
+          <ion-icon name="share"></ion-icon>
+      </button>
+      <img *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
+      <div class="card-title">{{song.title}}</div>
+      <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
+        <button secondary id="likeButton">Like</button>
+      </div>
+      <div (click)="play(song.id, song.title, song.duration)" class="playButton">
+        <button secondary>Play</button>
+      </div>
+    </ion-card>
+    
+    <button id="fabButton" (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
+      <ion-icon name="search"></ion-icon>
     </button>
-    <img (click)="options(song.permalink_url, song.user.permalink_url)" *ngIf="song.artwork_url !== null" src="{{song.artwork_url | image}}">
-    <div class="card-title">{{song.title}}</div>
-    <div [hidden]="!loggedIn" (click)="like(song.id)" class="likeButton">
-      <button secondary id="likeButton">Like</button>
-    </div>
-    <div (touchend)="play(song.id, song.title, song.duration)" class="playButton">
-      <button secondary>Play</button>
-    </div>
-  </ion-card>
 
-  <button id="searchButton" (click)="search()" secondary fab fab-right fab-bottom fab-fixed>
-    <ion-icon name="search"></ion-icon>
-  </button>
-
-</ion-content>
+  </ion-content>

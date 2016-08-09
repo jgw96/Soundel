@@ -29,13 +29,5 @@ export class MusicService {
     })
   }
 
-  public getTracks(term: string) {
-    return SC.get("/tracks", {
-      q: term,
-      streamable: true,
-      limit: 30
-    });
-  }
-
 }
 

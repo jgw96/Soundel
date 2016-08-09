@@ -2,7 +2,6 @@ import {Component} from "@angular/core";
 import {NavController, Tabs, Platform} from 'ionic-angular';
 
 import {HomePage} from '../home/home';
-import {LikedPage} from '../liked/liked';
 import {SettingsPage} from "../settings/settings";
 
 @Component({
@@ -17,7 +16,6 @@ export class TabsPage {
   constructor(public nav: NavController, private platform: Platform) {
     // set the root pages for each tab
     this.tab1Root = HomePage;
-    this.tab2Root = LikedPage;
     this.tab3Root = SettingsPage;
   }
 
