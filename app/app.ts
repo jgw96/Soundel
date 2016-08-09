@@ -24,4 +24,8 @@ export class MyApp {
   }
 }
 
-ionicBootstrap(MyApp);
+ionicBootstrap(MyApp, [], {
+  tabsPlacement: 'top',
+  tabsHideOnSubPages: true,
+  tabsHighlight: true
+});
