@@ -33,7 +33,11 @@ var MyApp = (function () {
     return MyApp;
 }());
 exports.MyApp = MyApp;
-ionic_angular_1.ionicBootstrap(MyApp);
+ionic_angular_1.ionicBootstrap(MyApp, [], {
+    tabsPlacement: 'top',
+    tabsHideOnSubPages: true,
+    tabsHighlight: true
+});
 
 },{"./pages/tabs/tabs":4,"@angular/core":154,"ionic-angular":468,"rxjs/Rx":505}],2:[function(require,module,exports){
 "use strict";
