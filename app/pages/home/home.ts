@@ -26,6 +26,7 @@ export class HomePage {
   public loggedIn: boolean;
   public avatar: string
   private toastOpen: boolean;
+  private initSong: any;
 
   constructor(
     private nav: NavController,
@@ -59,11 +60,19 @@ export class HomePage {
           if (value === null) {
             this.musicService.getFirstTracks("Tame Impala").then((tracks) => {
               this.songs = tracks;
+              console.log(tracks);
+              SC.stream(`/tracks/${tracks[0].id}`).then((player) => {
+                this.initSong = player;
+              })
               loading.dismiss();
             })
           }
           else {
             this.musicService.getFirstTracks(value).then((tracks) => {
+              console.log(tracks);
+              SC.stream(`/tracks/${tracks[0].id}`).then((player) => {
+                this.initSong = player;
+              })
               this.songs = tracks;
               loading.dismiss();
             })
@@ -245,18 +254,23 @@ export class HomePage {
   }
 
   private play(id: string, songName: string, duration: number): void {
+    this.initSong.play();
+    setTimeout(() => {
+      this.initSong.pause();
+    },50)
     let loading = this.loadCtrl.create({
       content: "Buffering..."
     });
     loading.present().then(() => {
       this.load(id, songName, duration).then((song) => {
+        console.log(song);
         song.play();
         setTimeout(() => {
           loading.dismiss();
         }, 700)
       })
 
-    })
+    });
   }
 
   private pause(): void {
