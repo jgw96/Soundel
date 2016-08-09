@@ -19,9 +19,13 @@ export class MyApp {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      StatusBar.backgroundColorByHexString("#1976D2");
+      //StatusBar.backgroundColorByHexString("#1976D2");
     });
   }
 }
 
-ionicBootstrap(MyApp);
+ionicBootstrap(MyApp, [], {
+  tabsPlacement: 'top',
+  tabsHideOnSubPages: true,
+  tabsHighlight: true
+});

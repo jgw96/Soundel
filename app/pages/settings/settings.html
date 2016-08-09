@@ -17,7 +17,7 @@
         <ion-icon name="search"></ion-icon>
       </button> Default Search: {{defaultSearch}}
     </button>
-    <ion-item>
+    <!--<ion-item>
       <button clear item-left>
         <ion-icon name="sunny"></ion-icon>
       </button> 
@@ -29,6 +29,18 @@
         <ion-icon name="happy"></ion-icon>
       </button>
       Rate this app
+    </button>-->
+    <button (click)="getMobileApp()" ion-item>
+      <button clear item-left>
+        <ion-icon name="appstore"></ion-icon>
+      </button>
+      Get Android Version!
+    </button>
+    <button (click)="github()" ion-item>
+      <button clear item-left>
+        <ion-icon name="code"></ion-icon>
+      </button>
+      Visit on Github!
     </button>
   </ion-list>
   
